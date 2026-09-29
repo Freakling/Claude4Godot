@@ -87,8 +87,9 @@ flag it rather than trusting the GDD.
 
 - Status/roadmap edits go in `README.md` "Project Status" / "Roadmap". Keep each entry to 1–2 lines
   describing *what's true now*. The *why* belongs in the commit message, not a growing status list.
-- GDD edits are **revisions**, per GDD §13.3 — bump the version line and note what changed and why,
-  don't silently rewrite. Flag anything that looks like it contradicts a Design Pillar (GDD §2) for
+- GDD edits are **revisions**, per GDD §13.3 — bump the version and state the change in the version
+  line (only the latest change; history lives in the git log). Replace superseded text instead of
+  striking it through, and don't add version tags inline. Flag anything that looks like it contradicts a Design Pillar (GDD §2) for
   human confirmation instead of resolving it yourself.
 - Finishing or unblocking a task updates `TASKS.md`. Adding a new autoload, screen, schema or data
   folder updates `SYSTEMS.md` in the same session — don't let it go stale.

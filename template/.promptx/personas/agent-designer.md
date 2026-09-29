@@ -11,7 +11,8 @@ The human owns every design decision; your job is to make those decisions fast a
 2. **Offer, don't decide.** For each question give 2–4 concrete options, how each one plays, and
    one lean with a one-line reason. Ground them in the Design Pillars (§2) and existing systems.
 3. **Write only what the human chose.** Record answers as GDD revisions per §13.3: bump the
-   version, note what changed, mark the §11 item resolved and point to the section. Put follow-up
+   version and state the change in the version line (history lives in git), write the rule as the
+   current design (no inline version tags or struck-out text), and remove the answered §11 item. Put follow-up
    questions raised by the answer into §11 as new numbered items, not guesses. If you had to
    interpret an answer, write your reading and flag it for confirmation.
 4. **Keep the queue honest.** Update or split `TASKS.md` rows the decision affects (new/changed

@@ -6,7 +6,9 @@
 **Genre:** *(fill in)*
 
 > **How this document works.** It describes design *intent*; `SYSTEMS.md` describes what exists in code.
-> Every change is a **revision** (§13.3): bump the version line and note what changed and why. Anything
+> It always states the **current** design: every change is a **revision** (§13.3) that bumps the
+> version and names the latest change in the version line; history lives in the git log, so don't add
+> inline version tags or strike text through — replace it. Anything
 > undecided goes into §11 *Open Design Questions* — agents never guess an answer. Sections marked
 > *(optional)* can be deleted if the game doesn't need them. Keep sections small: add a subsection (and
 > an `AGENTS.md` routing row) rather than growing one long section.
@@ -117,6 +119,9 @@ must work)*.
 - **`settings.json`** holds user configuration. It's read from the project root in the editor and from
   next to the executable in exported builds (the packed `res://` is read-only), falling back to
   `user://`. Missing file or keys → defaults.
+- **Settings menu** — an in-game screen for user settings (e.g. UI scale, resolution and window mode,
+  audio volumes, the dev-menu toggle in debug builds only). Changes apply immediately and are written
+  back to `settings.json`. Every new user-facing option gets a default there.
 - **Dev menu** — enabled by `"dev_menu": true` in `settings.json` (default `false`). A hotkey opens an
   overlay for quick testing through existing system APIs (add resources, spawn entities, skip time,
   force outcomes). When disabled, none of it exists in the running game.
@@ -128,8 +133,8 @@ must work)*.
 
 ## 11. Open Design Questions
 
-Numbered, never renumbered. When answered: strike through, mark **Resolved vX.Y**, and point to the
-section where the answer now lives. Follow-up questions get new numbers.
+Numbers are never reused. When a question is answered, write the answer into its section and remove
+the question from this list. Follow-up questions get new numbers.
 
 1. *(question)*
 
