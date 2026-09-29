@@ -29,6 +29,8 @@ application:
    `design/gdd.md` §10 (design intent). Game rules go in systems, never in screen scripts.
 3. Implement statically-typed GDScript, matching existing naming and folder conventions. New balance
    numbers go in `.tres`/Resource fields with labeled placeholder defaults, never hardcoded.
+   If the project has a dev menu (GDD §10), every new system or feature also adds its dev-menu actions
+   and inspector fields in the same task.
 4. Verify with the headless check (must exit clean).
 5. Update docs per `AGENTS.md` "Updating docs after a task": `TASKS.md` status, `SYSTEMS.md` for new
    systems/screens/schemas/data folders, README status/roadmap, and `playtesting/FUNCTION_CHECK.md` —

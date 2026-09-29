@@ -120,6 +120,9 @@ must work)*.
 - **Dev menu** — enabled by `"dev_menu": true` in `settings.json` (default `false`). A hotkey opens an
   overlay for quick testing through existing system APIs (add resources, spawn entities, skip time,
   force outcomes). When disabled, none of it exists in the running game.
+- The dev menu has **a tab per system** and a **read-only state inspector** for hidden values (timers,
+  hidden meters, random rolls' inputs). **Every new system or feature adds its own dev-menu actions and
+  inspector fields as part of its task**, so the menu always covers the whole backend.
 
 ---
 
