@@ -131,7 +131,8 @@ ready-to-paste commit prompt for Claude Code.
 | "Let's brainstorm {topic}." | Cowork | Design session; your answers become GDD revisions and task rows |
 | "Review the documentation and make sure the tasks are aligned." | Cowork | Consistency pass across GDD, tasks, systems, README and routing; fixes drift and flags what needs your call |
 | "Process my playtest." | Cowork | Turns a playtest report into GDD revisions, new tasks and bug rows |
-| "Process my function check." | Cowork | Every failed item becomes a bug row; rules with no task are raised as possible tasks |
+| "Prepare a function check." | Cowork | Writes this round's checklist (built items only, Works / Broken boxes + Notes) — nothing to copy |
+| "Process the function check." | Cowork | Broken items become bug rows or design changes; each item's last result is recorded; unchecked items stay for next round |
 | "Prune the task list." | Cowork | Archives done tasks and bugs (nothing is deleted) |
 | "Commit and push." | Claude Code | Commits exactly the files named, after the headless check, only with your approval |
 

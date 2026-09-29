@@ -44,7 +44,7 @@ dependency lives **only** here; `README.md` "Project Status" tracks milestones, 
 | ID | Task | Status | Depends on | Systems | Touches | Done when | GDD ref |
 |---|---|---|---|---|---|---|---|
 | T1 | Headless check passes on a clean checkout | ready | — | — | `project.godot` (only if needed) | `{{GODOT_BIN}} --headless --path . --quit` exits with no errors or warnings | §10 |
-| T2 | Run + process a function check after each feature update (recurring) | blocked | — | — | `playtesting/<version>/function_check_N.md` *(new, copied from `FUNCTION_CHECK.md`)*, new `## Bugs` rows, new rows for ⚠ gaps the human approves | Becomes `ready` whenever a feature update lands. Human has checked every ✔ item; each ❌ is a bug row; ⚠ gaps have been raised. Stays in the queue as the next check's row | §13.4 |
+| T2 | Run + process a function check after each feature update (recurring) | blocked | — | — | Cowork prepares `playtesting/<version>/function_check_N.md` (Built items only, Works / Broken boxes + Notes), then processes it: new `## Bugs` rows, design changes, rows for gaps the human approves | Becomes `ready` whenever a feature update lands. Human has ticked what they checked; each Broken item is a bug row or a design change; unchecked items stay for next round. Stays in the queue as the next check's row | §13.4 |
 
 ## Bugs
 

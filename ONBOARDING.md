@@ -82,9 +82,9 @@ For each file in `template/`, copy it to the same relative path in the project r
    "Fill the playtest template's loop sections (after GDD §3 is decided)".
 6. **`playtesting/FUNCTION_CHECK.md`:** replace the example items with **one item per rule in the
    GDD**, grouped by GDD section and linked to it (GDD §13.4). For each item, set the build status
-   from what you found in the code: ✔ if it clearly exists (name the task if there is one, otherwise
-   "✔ existing"), ⏳ with the task ID if a `TASKS.md` row covers it, ⚠ if nothing does. Show the human
-   the ⚠ list — those are rules nobody has planned yet.
+   from what you found in the code: `Built (Tn)` if it clearly exists (or `Built (existing)` without a
+   task), `Waiting (Tn)` if a `TASKS.md` row covers it, `No task` if nothing does. Show the human the
+   `No task` list — those are rules nobody has planned yet.
 
 ## Step 3b — Fresh start: design interview
 
@@ -100,7 +100,7 @@ Write the answers into the GDD; everything undecided goes into §11. Seed `TASKS
 e.g. project settings, folder layout, a first autoload for game state, a first playable scene, and the
 headless check passing. Fill the playtest template's loop sections from the core loop you agreed
 (same as Step 3a item 5), and write the function check from the GDD you just drafted (Step 3a item 6)
-— for a fresh game every item starts as ⏳ or ⚠.
+— for a fresh game every item starts as `Waiting` or `No task`.
 
 ## Step 4 — Responsibility split
 
@@ -126,7 +126,7 @@ Check, and fix what's yours to fix:
 - Every `TASKS.md` row has Status, Depends on, Touches, Done when and GDD ref; `ready` rows have all
   dependencies `done`.
 - Every GDD rule has a `FUNCTION_CHECK.md` item, every item links to an existing GDD heading, and every
-  ⏳ item names a real task.
+  `Waiting` item names a real task.
 - The headless command uses the real Godot binary everywhere it appears: `AGENTS.md`,
   `.promptx/personas/_core-principles.md`, `TASKS.md` (row T1) and `README.md` (Getting Started).
 - The personas listed in `CLAUDE.md` all exist.

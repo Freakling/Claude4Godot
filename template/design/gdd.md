@@ -181,15 +181,17 @@ feature is playable.
 - A **function check** is a second kind of playtest: a human verifies, item by item, that **every rule
   in this GDD works in the game**. The loop-based playtest asks how the game feels; the function check
   asks whether each function works as written.
-- The master list is `playtesting/FUNCTION_CHECK.md`. **Every GDD rule has exactly one checkable item**
-  there, linked to its GDD section, with an ID (`FC-<section>-<nn>`) and a build status: built (the
-  task that built it), waiting on a task, or **no task yet** — so any rule nobody has planned shows up
-  as a gap.
+- The master list is `playtesting/FUNCTION_CHECK.md`. **Every GDD rule has exactly one item** there,
+  linked to its GDD section, with an ID (`FC-<section>-<nn>`), a status in words — `Built (Tn)`,
+  `Waiting (Tn)` or `No task` (a gap) — and its last result.
 - **Keeping it in sync:** a GDD revision that adds, changes or removes a rule updates
-  `FUNCTION_CHECK.md` in the same revision. When a task is marked `done`, its items flip to built.
-- **Running one:** copy the list to `playtesting/<version>/function_check_<#>.md` and tick each built
-  item; mark failures ❌ with a note.
-- **Processing:** every ❌ becomes a row in the `## Bugs` table in `TASKS.md`. Gaps (rules with no
-  task) are raised with the human as possible new tasks.
+  `FUNCTION_CHECK.md` in the same revision. When a task is marked `done`, its items change to Built.
+- **Running one:** the human asks Cowork to **prepare a function check**; Cowork writes
+  `playtesting/<version>/function_check_<#>.md` with only the Built items, each with
+  `[ ] Works   [ ] Broken / missing` and a `Notes:` line. The tester only ticks boxes and types
+  notes — **no box ticked = not checked this round**. No symbols to copy.
+- **Processing:** every Broken item becomes a row in the `## Bugs` table in `TASKS.md` (or a GDD
+  revision, if the notes say the rule should change); the master list records each item's last
+  result; gaps are raised with the human as possible new tasks.
 - **Cadence:** a function check after each feature update, alongside or instead of a loop-based
   playtest.

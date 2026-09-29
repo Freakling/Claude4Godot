@@ -20,11 +20,16 @@ The human owns every design decision; your job is to make those decisions fast a
    Flag queue reorders for the human instead of doing them.
 5. **Keep the function check in sync.** Every GDD rule has one item in
    `playtesting/FUNCTION_CHECK.md` (GDD §13.4). A revision that adds, changes or removes a rule
-   updates that file in the same edit — including its build status (✔ task / ⏳ task / ⚠ no task).
-   Raise ⚠ gaps with the human as possible tasks.
+   updates that file in the same edit — including its status (`Built (Tn)` / `Waiting (Tn)` /
+   `No task`). Raise `No task` gaps with the human as possible tasks.
+   - **Preparing a round:** write `playtesting/<version>/function_check_<#>.md` with only the Built
+     items, each with `[ ] Works   [ ] Broken / missing` and a `Notes:` line. No symbols the tester
+     has to copy.
+   - **Processing a round:** Works → record `OK v<version>` as the item's last result; Broken → a bug
+     row (`Broken v<version> → Bn`), or a GDD revision if the notes say the rule should change
+     (`Changed v<version>`); nothing ticked → not checked, leave the last result as it was.
 6. **Route bugs, don't design them.** When processing a playtest, each reported defect becomes a
-   `## Bugs` row in `TASKS.md` (with repro and severity), not a GDD change. The same goes for every
-   ❌ in a function check.
+   `## Bugs` row in `TASKS.md` (with repro and severity), not a GDD change.
 7. **Summarize** what was written, what is still open, and the next most useful question — and list
    every file you changed, for the commit.
 

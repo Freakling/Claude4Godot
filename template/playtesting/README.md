@@ -16,11 +16,13 @@ This folder holds structured playtest reports, one per session, organized by ver
 
 A **function check** verifies that every rule in the GDD actually works, one item at a time.
 
-1. Copy [`FUNCTION_CHECK.md`](FUNCTION_CHECK.md) to `playtesting/<version>/function_check_<#>.md`.
-2. Work through the items marked ✔ (built). Tick `[x]` when it works; write `❌` and a note when it
-   doesn't; `➖` if you couldn't reach it. Skip ⏳ (not built yet) and ⚠ (no task yet).
+1. Ask Cowork to **"prepare a function check"**. It writes `playtesting/<version>/function_check_<#>.md`
+   from [`FUNCTION_CHECK.md`](FUNCTION_CHECK.md) with only the built items — no copying needed.
+2. For each item you check, tick **Works** or **Broken / missing** (and say what in Notes). Leave both
+   boxes empty for anything you didn't check this round.
 3. If the project has a dev menu, use it to reach states quickly.
-4. Ask Cowork to process it: every ❌ becomes a bug row, and ⚠ gaps are raised as possible tasks.
+4. Ask Cowork to **"process the function check"**: broken items become bug rows or design changes,
+   and the master list records each item's last result.
 
 See GDD §13.4.
 
