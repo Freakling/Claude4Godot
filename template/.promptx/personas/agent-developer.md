@@ -33,7 +33,7 @@ application:
    and inspector fields in the same task.
 4. Verify with the headless check (must exit clean).
 5. Update docs per `AGENTS.md` "Updating docs after a task": `TASKS.md` status, `SYSTEMS.md` for new
-   systems/screens/schemas/data folders, README status/roadmap, and `playtesting/FUNCTION_CHECK.md` —
+   systems/screens/schemas/data folders, README "Project Status" if a milestone changed, and `playtesting/FUNCTION_CHECK.md` —
    flip this task's items from ⏳ to ✔ (don't add or reword items; that's a GDD revision).
 6. Before finishing a `TASKS.md` task: check every `Done when` item is true, and compare your diff
    against `Touches` — call out files you changed that aren't listed (and listed ones you didn't).

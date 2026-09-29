@@ -4,7 +4,7 @@
 [`design/gdd.md`](design/gdd.md) for the full Game Design Document.
 
 This README serves two audiences:
-- **Humans** — a project overview, roadmap, and contribution guide.
+- **Humans** — project overview, milestone status, content-editing guide, getting started.
 - **AI coding agents** — start at [`AGENTS.md`](AGENTS.md), not here. It routes you to the one
   section of this file, the GDD, or the docs below that your task needs.
 
@@ -16,28 +16,30 @@ This README serves two audiences:
 | [`AGENTS.md`](AGENTS.md) | Agent routing table and ground rules |
 | [`.promptx/personas/`](.promptx/personas/) | Agent personas + shared `_core-principles.md` |
 | [`playtesting/`](playtesting/) | Playtest reports and template |
-| This README | Project status, roadmap, content-editing guide, AI/human split, getting started |
+| This README | Milestone status, content-editing guide, AI/human split, getting started |
+
+The GDD is the master for *what* the game is; `TASKS.md` for the work; this README only tracks
+**milestones**.
 
 ---
 
 ## Project Status
 
-| Area | Status |
+One row per milestone, in build order. Each row says what's true now in one line and points to GDD
+sections or `TASKS.md` — never a list of individual tasks or features.
+
+| Milestone | Status |
 |---|---|
-| Core design (GDD) | 🟨 Drafting |
+| Design (GDD) | 🟨 Drafting — open questions in GDD §11 |
+| Phase 1 — Foundation: project settings, core systems, headless check passing | ⬜ Not started |
+| Phase 2 — Core loop playable (grey-box) | ⬜ Not started |
+| *(further phases from the GDD — one row each)* | ⬜ |
+| Content & balance — replace placeholder `.tres` values with tuned ones (human-owned, driven by playtests) | ⬜ Not started |
+| Production assets — art, animation, audio replacing placeholders (human-owned) | ⬜ Not started |
+| Platform readiness — input parity, store packaging | ⬜ Not started |
+| Playtesting (GDD §13) | ⬜ Template and function check ready; no playtests yet |
 
 Legend: ✅ done · 🟨 in progress · ⬜ not started
-
----
-
-## Roadmap
-
-Grouped roughly in build order. Task-level detail lives in [`TASKS.md`](TASKS.md).
-
-### Phase 1 — Foundation
-- [ ] GDD: pitch, pillars, core loop
-- [ ] Project settings, folder layout, headless check passing (T1)
-- [ ] First playable loop (grey-box)
 
 ---
 

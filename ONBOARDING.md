@@ -59,7 +59,7 @@ For each file in `template/`, copy it to the same relative path in the project r
 - **If the target doesn't exist:** copy it.
 - **If it exists** (commonly `README.md`, `CLAUDE.md`, `AGENTS.md`): **don't overwrite.** Merge — keep
   the human's content, add the Claude4Godot sections that are missing, and list what you merged. For
-  `README.md`, add the "Project Status", "Roadmap" and "AI vs. Human Responsibilities" sections and the
+  `README.md`, add the "Project Status" (milestones) and "AI vs. Human Responsibilities" sections and the
   doc-ownership table from `template/README.md` if they're missing.
 - Keep the empty `.gdignore` files in `design/` and `playtesting/` — they stop Godot from importing
   those Markdown folders. (`.promptx/` is a hidden folder, which Godot skips anyway.)

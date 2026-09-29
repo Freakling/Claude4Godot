@@ -1,7 +1,7 @@
 # TASKS.md
 
 The active work queue — this is what "do the next step" points at. Task-level sequencing and
-dependency lives **only** here; `README.md` tracks coarse phase status, not individual tasks.
+dependency lives **only** here; `README.md` "Project Status" tracks milestones, not individual tasks.
 
 ## How to use this file
 
@@ -23,7 +23,7 @@ dependency lives **only** here; `README.md` tracks coarse phase status, not indi
    not a growing prose block here — this file needs to stay skimmable every session.
 7. If a task reveals a new task (e.g. a missing prerequisite), add a row for it rather than doing it
    silently as a sub-step — keeps the dependency graph honest.
-8. **Archiving:** move `done` rows below `## Archived` once their phase (README roadmap) is complete,
+8. **Archiving:** move `done` rows below `## Archived` once their milestone (README "Project Status") is complete,
    or whenever the human asks for a prune. Never delete rows — archived IDs stay citable from GDD
    revision notes and playtest reports. Done bugs go to the archived bugs table. If it's unclear
    whether a `done` task might be revisited, leave it and ask the human.

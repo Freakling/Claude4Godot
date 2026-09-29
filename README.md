@@ -30,7 +30,7 @@ Claude4Godot/
     ├── AGENTS.md              router: which doc/section to open for which task + ground rules
     ├── TASKS.md               the work queue + bug table + archive
     ├── SYSTEMS.md             what exists in code: systems, files, dependencies
-    ├── README.md              skeleton for your project README (status, roadmap, responsibility split)
+    ├── README.md              skeleton for your project README (milestones, responsibility split)
     ├── design/gdd.md          Game Design Document skeleton with the revision + open-question process
     ├── playtesting/           loop-based playtest template, function-check list (every GDD rule,
     │                          human-checkable), and how feedback flows back into the GDD
@@ -39,7 +39,7 @@ Claude4Godot/
 ```
 
 After installation your project root holds `CLAUDE.md`, `AGENTS.md`, `TASKS.md`, `SYSTEMS.md`,
-`design/`, `playtesting/` and `.promptx/`, and your `README.md` gains the status, roadmap and
+`design/`, `playtesting/` and `.promptx/`, and your `README.md` gains the milestone status and
 responsibility sections (merged into it if you already had one). The `Claude4Godot/` folder can then
 be deleted or kept for reference.
 
@@ -151,8 +151,10 @@ ready-to-paste commit prompt for Claude Code.
   be rebuilt without breaking gameplay, and state can be saved.
 - **Small files, findable.** Every new system gets a `SYSTEMS.md` row; every new GDD section gets an
   `AGENTS.md` routing row. Agents read only what a task needs.
-- **Docs stay honest.** GDD edits are versioned revisions; `TASKS.md` is the only queue; `SYSTEMS.md` is
-  the truth about what exists in code.
+- **Docs stay honest, and each fact lives in one place.** The GDD is the master for what the game is
+  and always states the current design (history lives in git); `TASKS.md` is the only queue;
+  `SYSTEMS.md` is the truth about what exists in code; your README tracks only milestones — one line
+  each, including the human-owned ones (tuning placeholder values, production assets).
 - **Everything in the GDD is checkable.** Every GDD rule has one item in
   `playtesting/FUNCTION_CHECK.md`, linked to its section and marked built, waiting on a task, or not
   planned — so a human can verify each function, and nothing in the design goes untracked.

@@ -28,7 +28,7 @@ several systems, open those specific sections one at a time rather than the full
 | Current autoload/screen architecture (what actually exists) | `SYSTEMS.md` — **authoritative** |
 | Coding standards, architecture principles, art policy | `gdd.md` §10 |
 | `settings.json`, dev menu | `gdd.md` §10 "Settings & Dev Tools" |
-| What's built, what's next | `README.md` "Project Status" / "Roadmap", `TASKS.md` (the queue) |
+| What's built, what's next | `README.md` "Project Status" (milestones), `TASKS.md` (the queue) |
 | Reporting or fixing a bug | `TASKS.md` `## Bugs` — one row per bug, with repro |
 | "Do the next step" / pick up new work | `TASKS.md` — find the first `ready` task, open only its `Touches` column; finish when its `Done when` holds |
 | Touching a system you haven't worked in before | `SYSTEMS.md` — find its row, then its GDD ref, then its files |
@@ -72,7 +72,7 @@ flag it rather than trusting the GDD.
 |---|---|---|
 | Runs Godot (headless check) and git (commits, pushes) | Yes — its job | No — hands Claude Code a file list and a commit prompt |
 | Owns (edits freely) | `scripts/`, `scenes/`, `data/`, `project.godot`, `SYSTEMS.md` | `design/`, `playtesting/` |
-| Shared: edit only your claimed row / relevant section | `TASKS.md`, `README.md` status/roadmap, `AGENTS.md`, `.promptx/` | same |
+| Shared: edit only your claimed row / relevant section | `TASKS.md`, `README.md` "Project Status", `AGENTS.md`, `.promptx/` | same |
 
 - **Claim before editing.** Set the row's Status to `in-progress: code` or `in-progress: cowork`
   first. Never edit a file listed in the other agent's in-progress row.
@@ -85,11 +85,14 @@ flag it rather than trusting the GDD.
 
 ## Updating docs after a task
 
-- Status/roadmap edits go in `README.md` "Project Status" / "Roadmap". Keep each entry to 1–2 lines
-  describing *what's true now*. The *why* belongs in the commit message, not a growing status list.
+- **Where things live:** the GDD is the master for *what* the game is; `TASKS.md` holds the work;
+  `README.md` "Project Status" holds only **milestones** — one row each, one line saying what's true
+  now, pointing to GDD sections or tasks. Never list individual tasks or features in the README; the
+  *why* of a change belongs in the commit message.
+- When a task finishes a milestone (or changes what's true about one), update that milestone's row.
 - GDD edits are **revisions**, per GDD §13.3 — bump the version and state the change in the version
   line (only the latest change; history lives in the git log). Replace superseded text instead of
-  striking it through, and don't add version tags inline. Flag anything that looks like it contradicts a Design Pillar (GDD §2) for
-  human confirmation instead of resolving it yourself.
+  striking it through, and don't add version tags inline. Flag anything that looks like it
+  contradicts a Design Pillar (GDD §2) for human confirmation instead of resolving it yourself.
 - Finishing or unblocking a task updates `TASKS.md`. Adding a new autoload, screen, schema or data
   folder updates `SYSTEMS.md` in the same session — don't let it go stale.
