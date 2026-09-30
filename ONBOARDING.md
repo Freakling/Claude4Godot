@@ -1,151 +1,158 @@
-# Claude4Godot — Onboarding script (for Claude Cowork)
+# Claude4Godot onboarding (for the AI assistant)
 
-You are installing Claude4Godot into the Godot project this folder sits in, and adapting it to that
-project. Follow the steps in order. The human decides everything that is a design or ownership call;
-you gather, propose, write and align.
+Follow these steps to install Claude4Godot into a Godot project, upgrade it, or migrate a project from Claude4Godot 1.x. Work from a session opened in the game's root folder, where `project.godot` is (or will be). You need to be able to run bash; on Windows, Git Bash.
 
-**Placeholders** in `template/` look like `{{NAME}}`. Every one must be replaced or removed before you
-finish — search for `{{` at the end.
+The human makes every design and ownership decision; you gather, propose and write. Ask choices as multiple-choice questions when your tool supports them.
 
-| Placeholder | Meaning |
+`$C4G` below is the Claude4Godot folder:
+- With the Claude Code plugin, it's `${CLAUDE_PLUGIN_ROOT}`.
+- With a manual install, it's the folder this file is in, usually `Claude4Godot/` inside the game.
+
+## 1. Preconditions and mode
+1. **Git.** The project must be a git repository. If it isn't, ask to run `git init`.
+2. **Manual install inside the game:** if `$C4G` is inside the project, add its relative path (e.g. `/Claude4Godot/`) to the file `git rev-parse --git-path info/exclude` names. Do it now, before any commit. That keeps it out of `git status`, the commits, the hooks and the check.
+3. **Clean tree.** A new repository with files in it: commit them as they are first, so the install is one reviewable diff. Otherwise there must be no uncommitted changes (apart from the Claude4Godot folder itself); ask the human to commit or stash them first.
+4. **Godot editor closed.** Ask the human to close the editor for this project during setup, since it rewrites `project.godot`.
+5. **Mode.** Tell the human which mode you detected, and let them confirm:
+   - **upgrade:** `.claude4godot/manifest` exists.
+   - **migrate from 1.x:** `.promptx/personas/` or `playtesting/FUNCTION_CHECK.md` exists. An `AGENTS.md` alone isn't proof, since many projects have one.
+   - **existing game:** `project.godot` and scripts, without Claude4Godot.
+   - **fresh start:** no `project.godot`, or an empty project.
+6. **Assistant adapters.** For a first install, ask which assistants will work on the game. The answer is `claude`, the default, or `none` for other assistants only; the core works through `AGENTS.md`, which most assistants read. An upgrade keeps the earlier choice.
+
+## 2. Install the files
+Run `bash "$C4G/install.sh" --tools <claude|none> .` for a first install. For an upgrade, run `bash "$C4G/install.sh" .` without `--tools`. Then read its report.
+- **`CONFLICTS`** (`<file>.c4g-new`) mean the project already had its own version of a framework file:
+  - `.claude/settings.json`: merge it, keeping the project's permissions, hooks and env and adding Claude4Godot's.
+  - Files left over from 1.x (migrate mode): take the new version.
+  - Anything else: show the human the difference and ask.
+
+  Delete each `.c4g-new` file once it's merged.
+- **"project files kept"** means the project already had that file.
+  - In migrate mode, step 5 rewrites these.
+  - Otherwise, bring each one into the shape of `$C4G/project/<same file>`:
+    - `CLAUDE.md` must contain the line `@AGENTS.md`, at the top. Move instructions meant for every assistant into AGENTS.md.
+    - `AGENTS.md` keeps its content, gains the missing sections, and gets the line that points to `.claude4godot/rules.md`.
+    - `TASKS.md` and `design/gdd.md` convert to the seed's format, keeping their content.
+- **Upgrade mode:**
+  1. Read the entries in `$C4G/CHANGELOG.md` that are newer than the old version (the install report names it), and carry out their "Upgrade steps".
+  2. Run step 3 only if `bash tools/check.sh` exits 3.
+  3. Summarise what changed, using the CHANGELOG and `git diff --stat`.
+  4. Go to step 9.
+
+## 3. Godot for this clone
+Run `bash tools/setup-clone.sh --skip-hook`, adding the Godot path if the human gave one. It finds Godot 4.3+ and saves the path in `tools/godot_bin.local`, which is gitignored and never committed. If it exits 3, ask the human where Godot is and rerun it with the path. On Windows, prefer the `*_console.exe` build.
+
+Then run `bash tools/check.sh` once and keep the result. An existing game often fails at first; that's information, not a blocker. The pre-commit hook is installed at the very end (step 9), so the install commit isn't blocked.
+
+## 4. Scan the project (read only)
+- `project.godot`: name, `config/features` (the Godot version), autoloads, main scene, renderer, and window/stretch settings.
+- Layout: where scripts, scenes, resource schemas, `.tres` data, screen/UI scripts and tests live, with a file count per folder.
+- Existing test suites: `addons/gut`, `addons/gdUnit4`.
+- Existing docs: README, design documents, TODO lists, changelogs.
+- `TODO`, `FIXME` and `HACK` comments, with file and line.
+- Game logic in screens: randomness, or assignments to autoload variables, in UI scripts.
+
+## 5. Content, by mode
+
+### Fresh start
+1. **The Godot project.** If there's no `project.godot`, write a minimal one yourself; don't send the human to Godot's project manager, which rewrites `.gitignore` and `.gitattributes`. Take the version from setup-clone's output (e.g. `4.7`). The renderer follows the interview: `forward_plus` is the default, and `gl_compatibility` suits web and low-end targets.
+   ```ini
+   config_version=5
+
+   [application]
+   config/name="<game name>"
+   config/features=PackedStringArray("<major.minor>")
+
+   [debug]
+   gdscript/warnings/untyped_declaration=2
+
+   [rendering]
+   renderer/rendering_method="forward_plus"
+   ```
+2. **A short design interview,** in short rounds. For each question, give options with a recommendation and let the human pick:
+   1. pitch, genre, and the feeling the game should give;
+   2. 3–5 Design Pillars;
+   3. the core loop: moment to moment, session, run or campaign, and starting conditions;
+   4. platforms, input, 2D or 3D, camera, art direction and target aspect ratios.
+3. **Record it.** Write the answers into the GDD as the current design, and add a line to `design/decisions.md` for each. Anything undecided becomes a `Q<n>`.
+4. **Seed TASKS.md,** each item with Size, `Touches` and tagged `Done when`: the folder layout, a first autoload for game state, a first rule class with a test, and the first playable grey-box scene set as the main scene.
+
+### Existing game
+1. **AGENTS.md › Architecture:** one row per autoload, per area of rule code, and per group of screens. Take "Owns" from the scripts' top comments and public methods, not from guesses.
+2. **GDD:** fill each section from the existing design documents and code. Mark anything inferred `(inferred — please confirm)`, and turn anything unknown into a `Q<n>`. Delete a section the game doesn't need only after the human agrees.
+3. **TASKS.md:** turn TODOs, known bugs and the human's priorities into items, with bugs as `B` items.
+4. **Screens with game logic.** Set `tools/check.cfg` › `[screens] dirs` to the UI folders. Each screen script that breaks the rule gets:
+   - its own `M` item titled "Decouple: <screen>", which moves the logic into a system and removes the script from the list;
+   - an entry in `[screens] known`, so the check passes meanwhile.
+5. **Check failures** from step 3 become the first items. Crashes are `high`.
+6. **Existing test suites.** Write `tools/check.local.sh` to run them headless. GUT: `"$GODOT_BIN" --headless -s addons/gut/gut_cmdln.gd -gexit`. gdUnit4: its command-line tool, with `--ignoreHeadlessMode`. The check itself skips their test files.
+7. **Typed GDScript.** Add `gdscript/warnings/untyped_declaration=2` under `[debug]` in `project.godot`. If the check then fails with many untyped declarations, set it to `1`, and add an item: "Type the remaining untyped declarations, then set untyped_declaration to 2". To list them later, set it to 2 temporarily.
+
+### Migrate from Claude4Godot 1.x
+Rewrite the old files into the new format (`$C4G/project/` shows the target shape of each, and `.claude4godot/tasks.md` the item format), then delete what's obsolete; git keeps the history. IDs carry over: T and B numbers stay the same, and §11 questions become `Q<n>` with the same number. Also do steps 4–7 of Existing game above, for the screens, the check failures, the test suites and the typing setting.
+
+| 1.x | 2.x |
 |---|---|
-| `{{PROJECT_NAME}}` | The game's name |
-| `{{ONE_PARAGRAPH_PITCH}}` | A 3–5 sentence description of the game |
-| `{{GODOT_VERSION}}` | e.g. `4.4` |
-| `{{GODOT_BIN}}` | The command Claude Code uses to run Godot, e.g. `godot`, `Godot.exe`, `/Applications/Godot.app/Contents/MacOS/Godot` |
-| `{{PLATFORMS}}` | Target platforms |
-| `{{DIMENSION}}` | `2D`, `3D` or both |
-| `{{DATE}}` | Today's date |
-| `{{LOOP_1}}`, `{{FIXED STATEMENT…}}`, `{{Open question…}}` | Only in `playtesting/TEMPLATE.md`: one section per core gameplay loop, each with a fixed scored statement and open questions (see Step 3) |
-| `{{GDD_VERSION}}`, `{{SYSTEM NAME}}`, `{{Observable behaviour…}}`, `{{how to reach it}}` | Only in `playtesting/FUNCTION_CHECK.md`: one item per GDD rule (see Step 3) |
+| `AGENTS.md` (routing table, ground rules, two agents, model sizing) | Rewrite from `$C4G/project/AGENTS.md`. The rules now live in `.claude4godot/rules.md`. Carry project-specific rules into Project rules. |
+| `SYSTEMS.md` | AGENTS.md › Architecture (System · Owns · Where · Talks to). Drop file-level detail the code already shows, then delete the file. |
+| `CLAUDE.md` (persona selection) | Replace with `$C4G/project/CLAUDE.md`. |
+| `.promptx/` | Delete. |
+| `README.md` › Project Status | TASKS.md › Milestones; leave a one-line link in the README. |
+| `README.md` › AI vs. Human Responsibilities, doc-ownership table | Record what differs from the defaults in Project rules, then delete both sections. |
+| `TASKS.md` tables | One heading per item: `ready`/`blocked` → `todo`; `in-progress: code`/`cowork` → `in-progress <today>`; `needs-validation` → `todo`, with "the check passes (check)" in `Done when`. Owner: `human` for human-only work, otherwise `agent` (Cowork's work is the agent's now). Size `TBD` → S/M/L by judgement. `## Bugs` rows → `B` items (Repro, severity, Found in). Drop the Systems column. Tag each `Done when` outcome `(test)`, `(check)` or `(play)`. Replace `§` references with heading names. Delete recurring rows such as the old T2. Move `## Archived` rows to `TASKS-archive.md`. Add the `Next IDs` line. |
+| `design/gdd.md` | Keep the content, but rename headings to the seed's names (High-Concept Pitch → Pitch; Core Gameplay Loop → Core Loop; Screens & Systems → Systems; Open Design Questions → Open Questions) and drop the numbers. See the next three rows for the sections that move. |
+| GDD §10 Technical Blueprint | Engineering conventions are in rules.md now; put any that differ in Project rules. Facts go to AGENTS.md. Platforms, input, camera and art go to GDD › Presentation and Platforms. Settings & Dev Tools: rewrite to the current rules (settings as JSON in `user://`; dev tools gated on debug builds or a feature tag). Add an item if existing code writes settings next to the executable or gates tools on a player-editable flag. |
+| GDD §11 Open Design Questions | Open Questions with `Q<n>` and a `Next` line. |
+| GDD §13 Playtesting Process, and the version line | Delete. The process is in `playtesting/README.md` now. |
+| Version line and revision notes | `design/decisions.md`: one line for each decision you can reconstruct from them and `git log -- design/gdd.md`. Don't invent reasons; write `why: not recorded` when none is known. |
+| `playtesting/FUNCTION_CHECK.md` | Write `playtesting/<today>-function-check.md` as a baseline ("carried over from 1.x"). Items whose last result was OK go in ticked Works; items that were built but never verified go in unticked. Items marked `Broken` with no bug become `B` items. Give the `No task` items to the human as a list: each may become an item. Then delete the file. |
+| `playtesting/README.md` | Take the new version (the `.c4g-new` file). |
+| `playtesting/<version>/playtest_N.md` | Leave in place as history. Add `**Processed:** under 1.x` to those already processed; ask if unsure. New reports are `playtesting/YYYY-MM-DD-playtest.md`. |
+| `playtesting/TEMPLATE.md` | Keep its loops and scored statements, worded exactly the same so scores stay comparable, in the new layout. |
+| A `Claude4Godot/` copy inside the game | Delete it after asking. |
+| Files under `.claude/` that aren't in `.claude4godot/manifest` (1.x agents, skills or commands) | List them for the human. Delete the 1.x ones after asking; keep the project's own. |
+| `core.hooksPath` set to `.githooks` | `tools/setup-clone.sh` explains it. The human runs `git config --unset core.hooksPath` (the guard hook blocks you from doing it), then setup-clone installs the hook the 2.x way. |
 
-Placeholders appear in `AGENTS.md`, `TASKS.md`, `README.md`, `design/gdd.md`,
-`playtesting/TEMPLATE.md`, `playtesting/FUNCTION_CHECK.md` and
-`.promptx/personas/_core-principles.md`.
+Finally, search the documents for leftovers and fix them. Use `git grep -n -e … -- '*.md'`, which skips an excluded Claude4Godot folder. Search for `§`, `SYSTEMS.md`, `SETUP.md`, `FUNCTION_CHECK`, `Cowork`, `needs-validation`, `in-progress:`, `persona`, `dev-small`, `.promptx`, `**Version:**`, `--headless --path . --quit` and `{{GODOT_BIN}}`.
 
----
+## 6. Project facts and settings
+- **AGENTS.md:** name, pitch, Godot version, dimension, platforms and rendering. Fill in the Layout table from the real folders (delete rows that don't apply), and the Architecture table (from step 5).
+- **`tools/check.cfg`:** set `[screens] dirs` to the real UI folders, and `known` as in step 5. Use `allow_writes_to` only for an autoload a screen legitimately edits, such as Settings, and ask the human first. Put third-party folders in `[scan] skip`.
+- **`project.godot`:** it has `untyped_declaration` (step 5).
 
-## Step 0 — Check your access
+## 7. Ownership and project rules
+Walk the human through the defaults. Record only the differences, in AGENTS.md › Project rules.
+- The human owns design, balance, art direction and priorities.
+- The agent owns code, data schemas, placeholder art, tests and the records.
+- Ask whether the agent may produce any production art, audio or player-facing text.
+- Commits: the agent proposes and the human approves. Pushes happen when the human asks, or never if there's no remote.
+- Model sizing (Claude Code only): off by default. When it's on, the `builder` subagent builds `S` items on Haiku.
+- Reviews: by default after `L` items, and after `M` items that change saves or a system's public methods.
 
-1. Confirm you can read and write the project root (the folder containing `project.godot`, or the repo
-   root if there's no project yet). If you can't, ask the human to connect that folder.
-2. Read this whole file, then `Claude4Godot/README.md`. Read the files in `Claude4Godot/template/` as
-   you install them.
+## 8. Playtest template
+Replace the `{{LOOP…}}` parts of `playtesting/TEMPLATE.md` with one section per loop in GDD › Core Loop, usually 3–6. Each gets one fixed scored statement and 1–2 open questions about decisions and feel. Update the "Loops you played" line to match.
 
-## Step 1 — Scan the project
+If the loops aren't decided yet, leave the placeholders, and add an agent item "Fill the playtest template's loop sections" that depends on the core-loop question.
 
-Collect, without changing anything:
-
-- Does `project.godot` exist? Its `[application]` name, `[autoload]` entries, rendering method, and
-  display/stretch settings.
-- Folder layout: where scripts, scenes, resources/data, assets and tests live. Count `.gd`, `.tscn`,
-  `.tres` files per folder.
-- Existing docs: `README.md`, `CLAUDE.md`, `AGENTS.md`, any design doc, TODO lists, changelogs,
-  issue exports. Note every file that the template would collide with.
-- `TODO` / `FIXME` / `HACK` comments in scripts (file + line + text).
-- Anything that looks like game logic living inside UI/screen scripts (e.g. random rolls or state
-  writes in a screen controller) — note it; it may become a decoupling task.
-
-Then **ask the human** (use your multiple-choice question tool):
-
-- Is this an **existing game in development** or **a fresh start**? (Suggest the answer your scan points
-  to.)
-- The values for the placeholders above that the scan couldn't find — especially `{{GODOT_BIN}}`.
-
-## Step 2 — Install the files
-
-For each file in `template/`, copy it to the same relative path in the project root:
-
-- **If the target doesn't exist:** copy it.
-- **If it exists** (commonly `README.md`, `CLAUDE.md`, `AGENTS.md`): **don't overwrite.** Merge — keep
-  the human's content, add the Claude4Godot sections that are missing, and list what you merged. For
-  `README.md`, add the "Project Status" (milestones) and "AI vs. Human Responsibilities" sections and the
-  doc-ownership table from `template/README.md` if they're missing.
-- Keep the empty `.gdignore` files in `design/` and `playtesting/` — they stop Godot from importing
-  those Markdown folders. (`.promptx/` is a hidden folder, which Godot skips anyway.)
-- Replace the placeholders you already know.
-
-## Step 3a — Existing game: adapt from what's there
-
-1. **`SYSTEMS.md`:** one row per autoload, per screen/scene group and per data folder you found. Fill
-   "What it owns" from reading the scripts' top comments and public functions, not from guessing.
-2. **`design/gdd.md`:** fill each section from existing docs and code. Anything you inferred rather
-   than read in a design doc is marked *"(inferred — please confirm)"*. Anything you can't tell becomes
-   a numbered question in §11 *Open Design Questions*. Delete sections the game doesn't need (e.g.
-   meta-progression) only after the human agrees.
-3. **`TASKS.md`:** turn TODOs, known bugs and the human's current priorities into rows (bugs into the
-   `## Bugs` table). If logic lives in screens, propose `[Decouple]` tasks that move it into systems.
-4. **`AGENTS.md`:** one routing row per GDD section you filled, plus the existing-code folders.
-5. **`playtesting/TEMPLATE.md`:** replace the `{{LOOP_…}}` sections with one section per core loop
-   from the GDD, each with one fixed scored statement and 1–2 open questions about decisions and
-   feel. If the loops aren't clear yet, leave the placeholders and add a `TASKS.md` row for Cowork:
-   "Fill the playtest template's loop sections (after GDD §3 is decided)".
-6. **`playtesting/FUNCTION_CHECK.md`:** replace the example items with **one item per rule in the
-   GDD**, grouped by GDD section and linked to it (GDD §13.4). For each item, set the build status
-   from what you found in the code: `Built (Tn)` if it clearly exists (or `Built (existing)` without a
-   task), `Waiting (Tn)` if a `TASKS.md` row covers it, `No task` if nothing does. Show the human the
-   `No task` list — those are rules nobody has planned yet.
-
-## Step 3b — Fresh start: design interview
-
-Adopt the Game Designer persona (`template/.promptx/personas/agent-designer.md`). Keep it short — a
-few questions per round, options with a lean, the human picks:
-
-1. Pitch, genre and the feeling the game should give.
-2. 3–5 Design Pillars (§2).
-3. The core loop: moment-to-moment, session, and run/campaign level (§3).
-4. Platforms, input, 2D/3D, art direction (placeholder-art policy), target aspect ratios (§10).
-
-Write the answers into the GDD; everything undecided goes into §11. Seed `TASKS.md` with setup rows,
-e.g. project settings, folder layout, a first autoload for game state, a first playable scene, and the
-headless check passing. Fill the playtest template's loop sections from the core loop you agreed
-(same as Step 3a item 5), and write the function check from the GDD you just drafted (Step 3a item 6)
-— for a fresh game every item starts as `Waiting` or `No task`.
-
-## Step 4 — Responsibility split
-
-Walk the human through the default split in `template/README.md` ("AI vs. Human Responsibilities") and
-the two-agent table in `template/AGENTS.md`. For each row, ask whether it fits; change owners, folders
-and rules to match their answers. Common adjustments:
-
-- Which folders each agent owns (code folders for Claude Code, docs folders for Cowork).
-- Whether AI may produce any non-placeholder art, audio or text content.
-- Whether Claude Code may push directly or only commit locally.
-- Which personas they want (remove unused ones from `CLAUDE.md`).
-- **Model sizing:** confirm the model each Size maps to (`TASKS.md` "Model sizing" — defaults: `S`
-  Haiku, `M` Sonnet, `L` Opus) and whether cost matters enough to use it at all.
-
-Write the result into the README table, the `AGENTS.md` two-agent table and, if principles changed,
-`.promptx/personas/_core-principles.md`.
-
-## Step 5 — Alignment pass
-
-Check, and fix what's yours to fix:
-
-- No `{{` placeholders remain — except in `playtesting/TEMPLATE.md` if you deliberately left its loop
-  sections for later and added the `TASKS.md` row for it.
-- Every GDD section has an `AGENTS.md` routing row; every `SYSTEMS.md` row has a GDD ref (or `—`).
-- Every `TASKS.md` row has Status, Size, Depends on, Touches, Done when and GDD ref (Size per `TASKS.md`
-  "Model sizing" — a quick judgement, not an analysis); `ready` rows have all
-  dependencies `done`.
-- Every GDD rule has a `FUNCTION_CHECK.md` item, every item links to an existing GDD heading, and every
-  `Waiting` item names a real task.
-- The headless command uses the real Godot binary everywhere it appears: `AGENTS.md`,
-  `.promptx/personas/_core-principles.md`, `TASKS.md` (row T1) and `README.md` (Getting Started).
-- The personas listed in `CLAUDE.md` all exist.
-
-## Step 6 — Hand-off
-
-Tell the human, briefly:
-
-1. What mode you used and what you inferred that needs their confirmation.
-2. **Every file you created or changed** (the full list — Claude Code commits exactly what you name).
-3. A ready-to-paste prompt for Claude Code:
-
-   > Run the headless check, then commit these files as one `docs:` commit — "docs: install
-   > Claude4Godot workflow" — and push only if I approve: {file list}
-
-4. The next steps: in Claude Code, "Do the next task"; in Cowork, "Which open questions block
-   development?"
-
-Finally, ask whether to delete the `Claude4Godot/` folder or keep it for reference.
+## 9. Verify, commit, hand off
+1. Run `bash tools/check.sh` and report the result.
+2. Search for `{{` with `git grep -n "{{" -- '*.md'`. Only postponed template loops may remain, and only if an item exists for them. `git ls-files -o -i --exclude-standard -- '*.c4g-new'` must print nothing.
+3. Walk through the checks in `.claude4godot/procedures/align.md`. Its fixes go into the install commit.
+4. List every file created, changed or deleted (`git status`). That includes the `.uid` files Godot 4.4+ creates next to scripts, among them `tools/check.gd.uid`.
+5. **Commit it all in one commit, after the human approves.**
+   - Stage everything: `git add -A -- <those files>`.
+   - Mark the scripts executable, listing only files that exist (`.claude/hooks` is there with the Claude adapter only): `git add --chmod=+x -- tools/*.sh .githooks/pre-commit`, plus `.claude/hooks/*.sh`.
+   - Use the message `chore: install Claude4Godot <version>` (or `migrate to` / `upgrade to`). The body names the mode and anything you inferred.
+6. **The pre-commit hook.**
+   - If the check passes, run `bash tools/setup-clone.sh`, which installs it.
+   - If the check fails, leave the hook off and add an item: "Install the pre-commit hook once the check passes (`bash tools/setup-clone.sh`)".
+   - If setup-clone exits 4, tell the human what it printed (an existing hook or `core.hooksPath` needs a manual line).
+7. **Manual install:** offer to delete the Claude4Godot folder from the game. Deleting it is recommended, since upgrades come from a fresh download or the plugin. If the human keeps it, leave it in `.git/info/exclude`.
+8. **Offer a "Development" section for the game's README:** clone, then `bash tools/setup-clone.sh`, then the commands.
+9. **Tell the human:**
+   - what needs their confirmation;
+   - how to use it: "do the next task", "let's brainstorm…", "process my playtest", "prepare a function check", "check the docs are aligned" (in Claude Code also `/next-task`, `/design`, `/playtest`, `/function-check`, `/align`, `/prune`);
+   - with the Claude adapter: to restart Claude Code, because skills, hooks and permissions load when a session starts;
+   - to open the project in the Godot editor once, and commit the `.uid` and `.import` files it creates;
+   - that every new clone needs `bash tools/setup-clone.sh`.

@@ -1,0 +1,12 @@
+{
+  "name": "claude4godot",
+  "description": "The Claude4Godot workflow for Godot games.",
+  "owner": { "name": "Freakling" },
+  "plugins": [
+    {
+      "name": "claude4godot",
+      "source": "./",
+      "description": "Installs and upgrades the Claude4Godot workflow in a Godot project."
+    }
+  ]
+}

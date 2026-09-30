@@ -1,219 +1,165 @@
 # Claude4Godot
 
-**Make the game you designed — with AI doing the building, and you staying the designer.**
+**Make the game you designed, with AI doing the building and you staying the designer.**
 
-Claude4Godot is a drop-in workflow for Godot projects. It turns two Claude agents into a small,
-disciplined dev team: one that designs and plans with you, one that writes the code. You keep every
-creative decision; they do the rest, and keep the project organised while they do it.
+A workflow for Godot projects, new or already in development. You decide the design, the balance and the priorities. The AI builds, tests and keeps the records. Built for Claude Code, and usable with any AI coding assistant that reads `AGENTS.md`. Everything lives in your game's own git repository.
 
-## Why use it
+## Why
 
-AI can write a lot of game code quickly. Without structure, that speed tends to go wrong in familiar
-ways:
+AI writes game code fast. Without structure, that speed goes wrong in familiar ways:
 
-- **Design drifts.** The AI quietly decides things you never agreed to — a mechanic, a number, a
-  rule — and after a few weeks the game isn't the one you had in mind.
-- **Context gets lost.** Every new session starts from scratch, re-reads everything, and contradicts
-  what was decided last week.
-- **Nobody knows what's real.** Design ideas, half-built features and working systems blur together,
-  so you can't tell what's done, what's broken and what's only planned.
-- **Code turns into a tangle.** Game rules end up inside UI screens, and every change breaks
-  something else.
-- **Costs creep up.** Big models read whole files and run on every small task.
+- **The design drifts.** The AI quietly decides a mechanic or a number you never agreed to. With Claude4Godot, design calls come to you as 2–4 options with a recommendation. Only your choice is written down, and anything undecided goes on an open-questions list instead of being guessed.
+- **"Done" means "it compiled".** One check defines "works": the whole project loads and the tests pass. It runs before every commit that touches code, and in Claude Code also before the AI ends its turn.
+- **Rules end up inside UI screens.** Game rules live in testable classes and screens only display them. The check fails when a screen rolls dice or writes game state.
+- **Context gets lost between sessions.** A few plain files hold everything: the design document, a decision log, the task queue, and an architecture table. Each fact has one home, so any session picks up where the last one stopped.
 
-Claude4Godot is built to prevent each of these:
+## How to use it
 
-| Problem | What the workflow does |
+### Install
+
+Your game needs git (`git init` if it has none) and no uncommitted changes. You also need Godot 4.3 or newer, and bash (on Windows it comes with Git for Windows).
+
+**Option 1: the Claude Code plugin.** In Claude Code:
+
+```
+/plugin marketplace add Freakling/Claude4Godot
+/plugin install claude4godot@claude4godot
+```
+
+Then open a new Claude Code session in your game's folder (or run `/reload-plugins`), and run `/claude4godot:setup`.
+
+**Option 2: manual install.** Put this repository in your game's root folder, next to `project.godot`, as a folder named `Claude4Godot`. Either run `git clone https://github.com/Freakling/Claude4Godot.git Claude4Godot` there, or download the zip and rename the extracted `Claude4Godot-main` folder. Then ask your assistant:
+
+> Read Claude4Godot/ONBOARDING.md and follow it to install Claude4Godot into this project.
+
+Either way, onboarding works out whether this is a new game, an existing game, a Claude4Godot 1.x project to migrate, or an upgrade. It then:
+1. installs the files and finds your Godot;
+2. interviews you (new game) or reads the existing game;
+3. agrees with you who owns what;
+4. ends with one commit for you to approve.
+
+Afterwards, restart Claude Code so the new commands load. Each new clone of the game later needs one command: `bash tools/setup-clone.sh`.
+
+**With another AI assistant:** tell onboarding, and it installs the tool-neutral core only (`--tools none`); you can also keep the Claude adapter alongside. Your assistant reads `AGENTS.md`, which points it to `.claude4godot/rules.md` and the procedures. The check and the git hook work the same for every tool, and for you.
+
+### Upgrade
+- **Plugin:** run `/plugin marketplace update claude4godot` and then `/plugin update claude4godot@claude4godot`. Start a new session in the game, and run `/claude4godot:setup` again.
+- **Manual:** put the new Claude4Godot folder in the game, and ask for ONBOARDING.md again.
+
+Only Claude4Godot's own files are replaced, and your edits to them are kept. When a new version also changes a file you edited, the new version is written next to it as `<file>.c4g-new` for you to merge. Review the result with `git diff`.
+
+### Day to day
+
+| Say | What happens |
 |---|---|
-| Design drift | **You decide; the AI proposes.** Agents offer options with a recommendation and write down only what you chose. Anything undecided goes on an *open questions* list instead of being guessed. |
-| Lost context | **Everything important lives in a few plain files** — a design document, a task queue, a map of the code, a router. Any agent in any session picks up exactly where the last one stopped. |
-| "What's real?" | **Each fact lives in one place.** The design doc says what the game *should* be, the task list says what's being built, the system map says what *exists*, and a function checklist lets you verify, rule by rule, that the game does what the design says. |
-| Tangled code | **Built-in architecture rules:** game logic in systems, not screens; all tunable values in data files you edit in the Godot Inspector; placeholder art that's easy to swap later. |
-| Rising cost | **Every task is sized** so it runs on the smallest model that can do it, and agents read only the files a task needs. |
-
-## The goal
-
-To spend your time on the parts only you can do — the ideas, the feel, the decisions, the playtesting
-— while the building, bookkeeping and consistency work happens around you. You play, you notice
-things, you talk them through — and they turn into design changes, then tasks, then working code,
-while the project stays coherent from the first prototype to the finished game.
-
-## Who does what
-
-| Who | Where | Responsible for |
-|---|---|---|
-| **You** (the developer) | — | Design, balance, art direction and priorities; playing and playtesting; approving commits and pushes. You have the final say on everything. |
-| **Claude Cowork** | Claude desktop app | Design sessions, GDD revisions, planning `TASKS.md`, keeping the docs aligned, processing playtests |
-| **Claude Code** | Terminal, IDE or desktop app | GDScript, scenes, `.tres` data, **running Godot** (the headless check) and **git** (commits and pushes, with your approval) |
-
-Running Godot and git is **Claude Code's job only**. Cowork doesn't commit: when it changes files, it
-lists them and gives you a ready-to-paste commit prompt for Claude Code. Neither agent makes design
-decisions or picks final balance numbers — those are yours.
-
-The agents coordinate through a small set of plain Markdown files — a design document, a task queue,
-a system map, a router and a set of personas — so either agent can pick up where the other left off,
-and so you always know what's decided, what's open and what's next. It works for a brand-new game or
-one already in development.
-
----
-
-## What's in this folder
+| "Do the next task" (`/next-task`) | Builds the next ready item (high-severity bugs first), proves it with the check, updates the records, and asks you to approve the commit. |
+| "Do the next 3 tasks", "Work through the queue" | The same, item after item, until one needs you. |
+| "Which open questions block development?" (`/design questions`) | Ranks the open design questions by what they unblock, with options and a recommendation for each. |
+| "Let's brainstorm {topic}" (`/design {topic}`) | A design session. Your decisions become GDD text, decision-log lines and task items. |
+| "New playtest", "Process my playtest" (`/playtest`) | Creates a report from the template, or turns a filled-in one into bugs, score trends and design proposals. |
+| "Prepare a function check", "Process the function check" (`/function-check`) | A checklist of what's been built since the last round and needs a human eye; you tick Works or Broken. |
+| "Check the docs are aligned" (`/align`) | A consistency pass. Drift gets fixed; gaps and conflicts come to you. |
+| "Prune the task list" (`/prune`) | Moves done items to `TASKS-archive.md`. |
 
 ```
-Claude4Godot/
-├── README.md          ← this file (for you)
-├── ONBOARDING.md      ← the install-and-adapt script Cowork follows
-├── .gdignore          ← keeps Godot from importing this folder
-└── template/          ← the files that get installed into your project root
-    ├── CLAUDE.md              entry point for every agent session
-    ├── AGENTS.md              router: which doc/section to open for which task + ground rules
-    ├── TASKS.md               the work queue + bug table + archive
-    ├── SYSTEMS.md             what exists in code: systems, files, dependencies
-    ├── README.md              skeleton for your project README (milestones, responsibility split)
-    ├── design/gdd.md          Game Design Document skeleton with the revision + open-question process
-    ├── playtesting/           loop-based playtest template, function-check list (every GDD rule,
-    │                          human-checkable), and how feedback flows back into the GDD
-    └── .promptx/personas/     shared core principles + 6 personas (developer, code reviewer,
-                               game designer, planner, rebaser, merger)
+you play, or have an idea
+        │
+        ▼
+design session ── options + a recommendation ── you decide ──► GDD + decisions.md + TASKS.md items
+        │
+        ▼
+next task ── builds the next ready item ── tests ── bash tools/check.sh ──► commit (you approve)
+        │
+        ▼
+playtest (how it feels)   ·   function check (does each built rule work?)
+        │
+        ▼
+bugs and design proposals ── you decide ── repeat
 ```
 
-After installation your project root holds `CLAUDE.md`, `AGENTS.md`, `TASKS.md`, `SYSTEMS.md`,
-`design/`, `playtesting/` and `.promptx/`, and your `README.md` gains the milestone status and
-responsibility sections (merged into it if you already had one). The `Claude4Godot/` folder can then
-be deleted or kept for reference.
+**From your phone:** start a Claude Code session on your workstation, turn on Remote Control (`/remote-control`), and continue it from the Claude mobile app; or send a task with Dispatch. The work still runs on your workstation, with Godot, git and your files, so the workstation has to stay awake.
 
 ---
 
-## Getting started
+## What this is
 
-### 1. Copy Claude4Godot into your project
+### Who does what
+| | Responsible for |
+|---|---|
+| **You** | Design, balance, art direction, priorities; playing and playtesting; approving commits. You have the final say on everything. |
+| **The AI assistant** | GDScript, scenes, `.tres` schemas, placeholder art, tests, running Godot and git, keeping the records true. |
 
-Copy the whole `Claude4Godot` folder into the root of your Godot project's git repository (next to
-`project.godot`). It works for an empty repo, a brand-new project, or a game already in development.
-
-### 2. Point both agents at the project folder
-
-- **Claude Code:** open a session in the project root (the folder with `project.godot`). Make sure it can
-  run Godot headlessly — you'll tell onboarding the path to your Godot binary.
-- **Claude Cowork:** in the Claude desktop app, start a Cowork session and select the same project
-  folder when it asks for folder access.
-
-### 3. Ask Cowork to install and adapt Claude4Godot
-
-Paste this into Cowork:
-
-> Read `Claude4Godot/ONBOARDING.md` and follow it to install Claude4Godot into this project.
-
-Cowork will scan the project and ask whether you're **adapting an existing game** or **starting
-fresh**:
-
-- **Existing game:** it maps your autoloads, scenes and scripts into `SYSTEMS.md`, drafts a GDD from
-  your existing docs and code (clearly marked *"inferred — please confirm"*), and turns TODOs and known
-  problems into `TASKS.md` rows and open questions.
-- **New game:** it runs a short design interview (pitch, pillars, core loop, platforms, art direction)
-  and writes a first GDD and a first set of setup tasks.
-
-Existing files are never overwritten — Cowork merges into your `README.md`, `CLAUDE.md` and any other
-file that already exists, and shows you what it changed.
-
-### 4. Decide the responsibility split
-
-Cowork walks you through who owns what — you, Claude Code, Cowork — using the default split as a
-starting point (design and balance are yours; code, data schemas and placeholder art are Claude Code's;
-design docs and planning are Cowork's). Change anything you like; the result is written into your
-README and `AGENTS.md`, and every agent follows it from then on.
-
-### 5. Align everything
-
-Cowork does a final pass so the GDD, `TASKS.md`, `SYSTEMS.md`, `AGENTS.md` and the personas all agree
-with each other and with what you want. It then lists every file it created or changed and gives you a
-ready-to-paste commit prompt for Claude Code.
-
-### 6. Start developing
-
-- In **Claude Code**: paste the commit prompt Cowork gave you in step 5 (it runs the headless check and
-  commits the listed files as one `docs:` commit), then say *"Do the next task."*
-- In **Cowork**: brainstorm, answer open questions, plan, and keep the docs aligned while you play.
-
----
-
-## How the workflow runs day to day
-
+### What gets installed in your game
 ```
-   you play / have an idea
-            │
-            ▼
- Cowork · Game Designer ──► options + a lean ──► you decide
-            │
-            ▼
- GDD revision (version bump)  +  new/updated TASKS.md rows  +  open questions (GDD §11)
-            │
-            ▼
- Claude Code · Developer ──► claims a ready task ──► implements ──► headless Godot check
-            │
-            ▼
- marks it done, updates SYSTEMS.md ──► you approve ──► commit + push
-            │
-            ▼
- playtest (how it feels) + function check (does every GDD rule work?)
-            │
-            ▼
- bugs table + new tasks + GDD revisions ──► repeat
+your-game/
+│  yours: never overwritten
+├── AGENTS.md                   for every assistant: project facts, layout, architecture, project rules
+├── CLAUDE.md                   "@AGENTS.md", for Claude Code
+├── TASKS.md                    milestones and the queue (tasks and bugs)
+├── design/gdd.md               the game's current design, and Open Questions
+├── design/decisions.md         why: one line per design decision
+├── playtesting/TEMPLATE.md     playtest template, one section per core loop
+├── tools/check.cfg             check settings: screen folders, folders to skip
+│
+│  Claude4Godot's, tool-neutral: updated on upgrade
+├── .claude4godot/rules.md      the workflow rules, loaded through AGENTS.md
+├── .claude4godot/tasks.md      the TASKS.md item format, read when items are written
+├── .claude4godot/procedures/   next-task · build · design · playtest · function-check · align · prune · review
+├── tools/check.sh, check.gd    the check;  tools/test_case.gd: base for tests in tests/
+├── tools/setup-clone.sh        per clone: finds Godot, installs the pre-commit hook
+├── .githooks/pre-commit        runs the check before commits that touch code, scenes or data
+├── playtesting/README.md       how playtests and function checks work
+│
+│  Claude4Godot's, Claude Code adapter: updated on upgrade
+├── .claude/skills/             /next-task and the rest: each points to its procedure
+├── .claude/agents/             builder (builds each item in a fresh context) · reviewer (read-only)
+├── .claude/hooks/              runs the check before a turn ends; blocks risky git commands
+└── .claude/settings.json       permissions, hooks, timeouts
 ```
+Machine-local and gitignored: `tools/godot_bin.local` (the path to your Godot) and `.claude/settings.local.json`.
 
-### Useful prompts
+### The rules, briefly
+The full rules are in `.claude4godot/rules.md`, and the assistant reads them every session.
+- **You decide design.** The assistant offers options and a recommendation. It never picks balance numbers (new values are marked `## PLACEHOLDER`), and never answers an open question itself.
+- **Each fact lives in one place,** and is updated in the same change that makes it untrue.
+- **Rules live in systems, not screens.** They sit in plain classes that tests can build directly. Saves are JSON in `user://`, never Resources, which can run scripts when loaded.
+- **Done means the check passes,** and the work is committed only with your approval.
+- **Guarded git:** in Claude Code, force-push, `reset --hard`, `--no-verify` and other work-destroying commands are blocked by a hook that checks the whole command line. It's a strong safety net, not a guarantee.
 
-| Say this | To | What happens |
-|---|---|---|
-| "Do the next task." | Claude Code | Picks the first `ready` row in `TASKS.md` (high-severity bugs first), claims it, builds it, runs the headless check |
-| "Which open questions block development?" | Cowork | Ranks GDD §11 questions by what they unblock, with options and a lean for each |
-| "Let's brainstorm {topic}." | Cowork | Design session; your answers become GDD revisions and task rows |
-| "Review the documentation and make sure the tasks are aligned." | Cowork | Consistency pass across GDD, tasks, systems, README and routing; fixes drift and flags what needs your call |
-| "Process my playtest." | Cowork | Turns a playtest report into GDD revisions, new tasks and bug rows |
-| "Prepare a function check." | Cowork | Writes this round's checklist (built items only, Works / Broken boxes + Notes) — nothing to copy |
-| "Process the function check." | Cowork | Broken items become bug rows or design changes; each item's last result is recorded; unchecked items stay for next round |
-| "Prune the task list." | Cowork | Archives done tasks and bugs (nothing is deleted) |
-| "Commit and push." | Claude Code | Commits exactly the files named, after the headless check, only with your approval |
+In Claude Code's default mode, the harness asks you before each commit and push. In auto or bypass mode those prompts don't appear, so the rules tell the assistant to ask you in the conversation instead.
 
----
+### Context and token use
+- **Small at the start.** A session starts with about 10 KB of instructions (AGENTS.md and the rules). Each procedure, and the task format, loads only when it's used.
+- **Builds run in a fresh context.** In Claude Code, the `builder` subagent reads, edits and checks, and the main session keeps only its short report. A session that gets through several tasks stays small instead of carrying every file it touched.
+- **Nothing to hand off.** TASKS.md, the commits and AGENTS.md hold the state, so after a commit you can `/clear`, or start a new session, and lose nothing. An item paused midway gets a one-line `Note:`.
+- **Model sizing** (optional, off by default): builds of small items run on Haiku. Turn it on in AGENTS.md › Project rules.
 
-## The rules both agents follow
+### The check
+`bash tools/check.sh` runs four steps:
+1. Godot's import pass;
+2. loads every script, scene and resource, checks screen scripts for game rules, and runs `tests/**/test_*.gd`;
+3. scans Godot's output for errors;
+4. runs `tools/check.local.sh`, if the game has one.
 
-- **You decide design.** Agents offer options and a lean; they write down only what you chose. Anything
-  undecided goes into GDD §11 *Open Design Questions* instead of being guessed.
-- **Numbers are placeholders.** Balance values live in `.tres` resources with labelled placeholder
-  defaults; tuning is a playtesting job, not an agent decision.
-- **Claim before editing.** A task's status becomes `in-progress: code` or `in-progress: cowork` before
-  any work starts; agents never edit files listed in the other agent's claimed task.
-- **Only Claude Code runs Godot and git.** Cowork's work on code or data ends at `needs-validation`; Claude
-  Code runs the headless check and commits. Every push needs your approval.
-- **Game logic lives in systems, not screens.** Screens display state and call system APIs — so the UI can
-  be rebuilt without breaking gameplay, and state can be saved.
-- **Small files, findable.** Every new system gets a `SYSTEMS.md` row; every new GDD section gets an
-  `AGENTS.md` routing row. Agents read only what a task needs.
-- **Spend where it pays.** Every task row carries a Size — `S`, `M` or `L` — that picks the model tier
-  Claude Code (or its subagents) runs it on: smallest for data and simple fixes, mid for typical
-  features, largest for cross-cutting work. It's set in seconds when the row is written, a task that
-  gets stuck is rerun one size up, and no extra analysis passes run unless they're likely to save more
-  than they cost.
-- **Docs stay honest, and each fact lives in one place.** The GDD is the master for what the game is
-  and always states the current design (history lives in git); `TASKS.md` is the only queue;
-  `SYSTEMS.md` is the truth about what exists in code; your README tracks only milestones — one line
-  each, including the human-owned ones (tuning placeholder values, production assets).
-- **Everything in the GDD is checkable.** Every GDD rule has one item in
-  `playtesting/FUNCTION_CHECK.md`, linked to its section and marked built, waiting on a task, or not
-  planned — so a human can verify each function, and nothing in the design goes untracked.
+It exits 0 on pass, 1 on fail, and 3 when it can't run. It remembers the last passing state, so hooks don't run it again when nothing has changed. Game-specific settings go in `tools/check.cfg`, and extra steps (for example an existing GUT suite) go in `tools/check.local.sh`.
 
----
+### Customising
+- **Project-specific rules** go in AGENTS.md › Project rules, where they win over the defaults. Project-wide Claude permissions and hooks go in `.claude/settings.json`. Per-machine ones go in `.claude/settings.local.json`.
+- **Change the framework itself:** edit `framework/` (installed files) or `project/` (seeds for new games), add the change to `CHANGELOG.md`, and run `bash selftest.sh <path to Godot>`. Then upgrade your games.
 
-## Requirements
+### This repository
+| Path | |
+|---|---|
+| `ONBOARDING.md` | what the assistant follows to install, migrate or upgrade |
+| `install.sh` | copies the files deterministically, keeps your edits, writes a manifest (`--tools claude\|none`) |
+| `framework/` | installed into each game: the tool-neutral core, plus `.claude/` for Claude Code |
+| `project/` | seeds for the game's own files, copied only when missing |
+| `.claude-plugin/`, `skills/setup/` | the Claude Code plugin (`/claude4godot:setup`) |
+| `examples/market-day/` | a tiny game that uses the workflow: a worked example, and the self-test's fixture |
+| `examples/scenarios.md` | prompts to try after changing the framework, to check that behaviour still holds |
+| `selftest.sh` | tests the installer, the check and the hooks (`bash selftest.sh [path to Godot]`) |
+| `CHANGELOG.md` | what changed, and the upgrade steps for games |
+| `CLAUDE.md` | instructions for an assistant working on Claude4Godot itself |
 
-- Godot 4.x (GDScript). Other languages work, but the templates assume statically typed GDScript.
-- A git repository for the project.
-- Claude Code, and the Claude desktop app with Cowork.
-
-## Customising Claude4Godot itself
-
-Everything is plain Markdown. Change a principle in `template/.promptx/personas/_core-principles.md`,
-add a persona and list it in `template/CLAUDE.md`, or reshape the GDD skeleton — then copy the updated
-folder into your next project.
+## License
+MIT © 2026 Vikingur Saemundsson: see [LICENSE](LICENSE). You may use, fork and change Claude4Godot, including in commercial games, as long as the copyright notice and the license stay with it. Installed games carry a copy in `.claude4godot/LICENSE`.

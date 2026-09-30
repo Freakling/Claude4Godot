@@ -1,0 +1,21 @@
+# Godot
+.godot/
+# Godot 4.4+ writes a .uid next to each script. A real game commits them; this example ignores
+# them so running it doesn't dirty the framework repo.
+*.uid
+
+# Claude4Godot's own files. In a real game they're committed; in this example they're installed
+# by install.sh (selftest.sh does it), so the framework repo holds only one copy.
+/.claude4godot/
+/.claude/
+/.githooks/
+/tools/check.sh
+/tools/check.gd
+/tools/test_case.gd
+/tools/setup-clone.sh
+/playtesting/README.md
+
+# Claude4Godot
+/tools/godot_bin.local
+/.claude/settings.local.json
+*.c4g-new
