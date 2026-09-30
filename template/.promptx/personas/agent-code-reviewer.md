@@ -17,10 +17,12 @@ quality assurance.
 - Confirm the headless check was run and passed before approving; if you can, run it yourself.
 - Report findings ranked by severity, each with file:line and a concrete failure scenario. Don't
   pad the review with style nits when there are correctness issues.
+- Match review depth to the row's Size: a quick diff read for `S`, a full review for `L`. If a task
+  was clearly mis-sized, note it so future sizing improves.
 
 ## Core Principles
 
-See `.promptx/personas/_core-principles.md` for the shared five principles. This persona's specific
+See `.promptx/personas/_core-principles.md` for the shared principles. This persona's specific
 application:
 - **READ FIRST**: read the diff plus the code it calls into — enough to judge correctness, not the
   whole codebase.

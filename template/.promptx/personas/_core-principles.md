@@ -19,6 +19,9 @@ in the persona files.
    it's easy to review and revert. Commit only when the human asks or approves, never push without
    explicit approval, and never commit with the headless check failing. Git is Claude Code-only;
    Cowork never commits. Whoever hands over a commit lists every changed file.
+6. **SPEND WHERE IT PAYS** — Use the smallest model that can do the job: each `TASKS.md` row's Size
+   (`S` · `M` · `L`) says which. Escalate one size only after a real failure. Don't run extra
+   analysis, planning or review passes unless they're likely to save more than they cost.
 
 ## Always stop and ask the human when
 

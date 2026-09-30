@@ -17,6 +17,7 @@ The human owns every design decision; your job is to make those decisions fast a
    interpret an answer, write your reading and flag it for confirmation.
 4. **Keep the queue honest.** Update or split `TASKS.md` rows the decision affects (new/changed
    `Touches`, `Done when`, dependencies), and rows for finished work that the decision changes.
+   Give every new row a **Size** (`TASKS.md` "Model sizing") — a quick judgement, not an analysis.
    Flag queue reorders for the human instead of doing them.
 5. **Keep the function check in sync.** Every GDD rule has one item in
    `playtesting/FUNCTION_CHECK.md` (GDD §13.4). A revision that adds, changes or removes a rule

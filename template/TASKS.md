@@ -32,6 +32,8 @@ dependency lives **only** here; `README.md` "Project Status" tracks milestones, 
 
 - **Status** — `ready` · `blocked` · `in-progress: code` / `in-progress: cowork` · `needs-validation`
   (edits done, headless check not run) · `done`.
+- **Size** — which model tier runs the task (see "Model sizing" below): `S` · `M` · `L`, `TBD` while
+  the task is still undefined, `—` for human/Cowork tasks. Bugs have a Size too.
 - **Systems** — `SYSTEMS.md` row names; look up full file paths there.
 - **Touches** — files expected to change. *(new)* = file to be created; `+field` = schema change. Paths
   are relative to `scripts/`, `scenes/`, or `data/` where obvious; `SYSTEMS.md` has the full ones.
@@ -39,12 +41,29 @@ dependency lives **only** here; `README.md` "Project Status" tracks milestones, 
   behavior: implement with a clearly-labeled placeholder and ask the human, don't pick an answer.
   A row that needs more than 3 outcomes, or spans 3+ systems, should be split.
 
+### Model sizing
+
+Every row gets a Size when it's written — a quick judgement from the row itself, never a separate
+analysis pass. Claude Code runs each task on the matching model (or subagent model):
+
+| Size | Model tier | Typical signs |
+|---|---|---|
+| **S** | Smallest (e.g. Haiku) | 1–2 files; `.tres` content, text, config or labels; a single-system bug with a clear repro; doc fixes |
+| **M** | Mid (e.g. Sonnet) | 1–2 systems; a new feature following an existing pattern; UI view work; a typical bug |
+| **L** | Largest (e.g. Opus) | 3+ systems or a cross-cutting refactor; save/format migrations; new architecture; core simulation code; a bug without a repro; judgement calls in `Done when` |
+
+- **Escalate, don't retry in place:** if a task fails the headless check twice, or the agent reports
+  it's stuck, rerun it one size up and add `(escalated from S)` to the row's Size. Those notes are
+  how the sizing gets better — no other analysis.
+- Orchestration, merging, reviews and shared-doc updates stay on the main session's model.
+- When in doubt between two sizes, pick the smaller one; escalation is cheap.
+
 ## Queue
 
-| ID | Task | Status | Depends on | Systems | Touches | Done when | GDD ref |
-|---|---|---|---|---|---|---|---|
-| T1 | Headless check passes on a clean checkout | ready | — | — | `project.godot` (only if needed) | `{{GODOT_BIN}} --headless --path . --quit` exits with no errors or warnings | §10 |
-| T2 | Run + process a function check after each feature update (recurring) | blocked | — | — | Cowork prepares `playtesting/<version>/function_check_N.md` (Built items only, Works / Broken boxes + Notes), then processes it: new `## Bugs` rows, design changes, rows for gaps the human approves | Becomes `ready` whenever a feature update lands. Human has ticked what they checked; each Broken item is a bug row or a design change; unchecked items stay for next round. Stays in the queue as the next check's row | §13.4 |
+| ID | Task | Status | Size | Depends on | Systems | Touches | Done when | GDD ref |
+|---|---|---|---|---|---|---|---|---|
+| T1 | Headless check passes on a clean checkout | ready | S | — | — | `project.godot` (only if needed) | `{{GODOT_BIN}} --headless --path . --quit` exits with no errors or warnings | §10 |
+| T2 | Run + process a function check after each feature update (recurring) | blocked | — | — | — | Cowork prepares `playtesting/<version>/function_check_N.md` (Built items only, Works / Broken boxes + Notes), then processes it: new `## Bugs` rows, design changes, rows for gaps the human approves | Becomes `ready` whenever a feature update lands. Human has ticked what they checked; each Broken item is a bug row or a design change; unchecked items stay for next round. Stays in the queue as the next check's row | §13.4 |
 
 ## Bugs
 
@@ -60,8 +79,8 @@ Defects in what's already built. New features and design changes stay in the Que
 - If a fix turns out to need a design change, add a Queue row or a GDD §11 question instead.
 - When more than ~10 bugs are open, move this table to its own `BUGS.md` and leave a pointer here.
 
-| ID | Bug | Status | Severity | Systems | Repro (steps → expected / actual) | Found in |
-|---|---|---|---|---|---|---|
+| ID | Bug | Status | Severity | Size | Systems | Repro (steps → expected / actual) | Found in |
+|---|---|---|---|---|---|---|---|
 
 ## Notes
 

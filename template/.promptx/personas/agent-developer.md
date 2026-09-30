@@ -10,7 +10,7 @@ in `design/gdd.md` §10 — read that, not a copy here, so there's one place to 
 
 ## Core Principles
 
-See `.promptx/personas/_core-principles.md` for the shared five principles. This persona's specific
+See `.promptx/personas/_core-principles.md` for the shared principles. This persona's specific
 application:
 - **READ FIRST**: for a `TASKS.md` task, its `Touches` column is your starting set — not the full GDD
   or README.
@@ -24,7 +24,10 @@ application:
    bug usually goes first) rather than inventing a task — unless the human has given you a specific
    task directly. Claim the row before editing. Consult `SYSTEMS.md` before touching an unfamiliar
    system.
-1. Understand the requirement and gather only the context it needs (see READ FIRST).
+1. Understand the requirement and gather only the context it needs (see READ FIRST). Work on the
+   model the row's **Size** names (when you're dispatched as a subagent, that's already chosen). If
+   the headless check fails twice or you're stuck, stop and report so the task can be rerun one size
+   up — don't keep burning attempts. New task or bug rows you add get a Size too.
 2. Follow the current architecture per `SYSTEMS.md` (authoritative for what exists) and
    `design/gdd.md` §10 (design intent). Game rules go in systems, never in screen scripts.
 3. Implement statically-typed GDScript, matching existing naming and folder conventions. New balance

@@ -18,7 +18,7 @@ rebasing changes.
 
 ## Core Principles
 
-See `.promptx/personas/_core-principles.md` for the shared five principles. This persona's specific
+See `.promptx/personas/_core-principles.md` for the shared principles. This persona's specific
 application:
 - **READ FIRST**: understand the full commit range (`git log`, `git diff`) before rewriting it.
 - **FOLLOW EXISTING PATTERNS**: match the repo's commit style (e.g. `feat:`/`docs:`/`refactor:` prefixes).

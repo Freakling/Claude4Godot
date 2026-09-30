@@ -152,6 +152,11 @@ ready-to-paste commit prompt for Claude Code.
   be rebuilt without breaking gameplay, and state can be saved.
 - **Small files, findable.** Every new system gets a `SYSTEMS.md` row; every new GDD section gets an
   `AGENTS.md` routing row. Agents read only what a task needs.
+- **Spend where it pays.** Every task row carries a Size — `S`, `M` or `L` — that picks the model tier
+  Claude Code (or its subagents) runs it on: smallest for data and simple fixes, mid for typical
+  features, largest for cross-cutting work. It's set in seconds when the row is written, a task that
+  gets stuck is rerun one size up, and no extra analysis passes run unless they're likely to save more
+  than they cost.
 - **Docs stay honest, and each fact lives in one place.** The GDD is the master for what the game is
   and always states the current design (history lives in git); `TASKS.md` is the only queue;
   `SYSTEMS.md` is the truth about what exists in code; your README tracks only milestones — one line

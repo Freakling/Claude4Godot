@@ -38,6 +38,7 @@ several systems, open those specific sections one at a time rather than the full
 | Function checks (is every GDD rule working?) | `playtesting/FUNCTION_CHECK.md`, `gdd.md` §13.4 |
 | Agent workflow / process | `.promptx/personas/_core-principles.md` + the persona file for your role (see `CLAUDE.md`) |
 | Which agent owns what / claiming a task | "Two agents" section below |
+| Which model runs a task | `TASKS.md` "Model sizing" — the row's Size column |
 
 ## Doc authority
 
@@ -82,6 +83,17 @@ flag it rather than trusting the GDD.
 - Only Claude Code commits (with human approval). Cowork's doc edits go in a separate `docs:` commit.
   When Cowork hands over a commit, it lists **every** file it changed since the last push.
 - Rebaser/Merger personas, worktrees and parallel subagents are Claude Code-only.
+
+## Model sizing — spend where it pays
+
+- Every task and bug row has a **Size**: `S` → smallest model, `M` → mid, `L` → largest (rules and
+  current model names in `TASKS.md` "Model sizing"). Whoever writes the row sets it — a quick
+  judgement, never a separate analysis pass.
+- Claude Code runs a task (or its subagent) on the model its Size names. Failing the headless check
+  twice or getting stuck → rerun one size up and note `(escalated from …)` on the row.
+- The main session's model keeps orchestration, merging, reviews and shared-doc updates.
+- The cheapest token is one not read: keep tasks small and `Touches` accurate, so every model reads
+  only what the task needs.
 
 ## Updating docs after a task
 

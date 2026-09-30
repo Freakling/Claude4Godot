@@ -112,6 +112,8 @@ and rules to match their answers. Common adjustments:
 - Whether AI may produce any non-placeholder art, audio or text content.
 - Whether Claude Code may push directly or only commit locally.
 - Which personas they want (remove unused ones from `CLAUDE.md`).
+- **Model sizing:** confirm the model each Size maps to (`TASKS.md` "Model sizing" — defaults: `S`
+  Haiku, `M` Sonnet, `L` Opus) and whether cost matters enough to use it at all.
 
 Write the result into the README table, the `AGENTS.md` two-agent table and, if principles changed,
 `.promptx/personas/_core-principles.md`.
@@ -123,7 +125,8 @@ Check, and fix what's yours to fix:
 - No `{{` placeholders remain — except in `playtesting/TEMPLATE.md` if you deliberately left its loop
   sections for later and added the `TASKS.md` row for it.
 - Every GDD section has an `AGENTS.md` routing row; every `SYSTEMS.md` row has a GDD ref (or `—`).
-- Every `TASKS.md` row has Status, Depends on, Touches, Done when and GDD ref; `ready` rows have all
+- Every `TASKS.md` row has Status, Size, Depends on, Touches, Done when and GDD ref (Size per `TASKS.md`
+  "Model sizing" — a quick judgement, not an analysis); `ready` rows have all
   dependencies `done`.
 - Every GDD rule has a `FUNCTION_CHECK.md` item, every item links to an existing GDD heading, and every
   `Waiting` item names a real task.
