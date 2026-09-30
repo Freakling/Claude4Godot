@@ -165,8 +165,9 @@ func _check_screens(files: Array[String]) -> void:
 	for autoload: String in _autoload_names():
 		if _allow_writes_to.has(autoload):
 			continue
-		# `Autoload.field = …`, `Autoload.field.x += …`, `Autoload.list[i] = …`, but not `==`.
-		var write: String = "(?<![\\w.])%s\\.[A-Za-z_]\\w*(\\.\\w+|\\[[^\\]]*\\])*\\s*[-+*/%%]?=(?!=)" % autoload
+		# `Autoload.field = …`, `Autoload.field.x += …`, `Autoload.list[i] = …`, but not `==`, and not
+		# a capitalised inner type or constant (`var s: Autoload.Store = …`).
+		var write: String = "(?<![\\w.])%s\\.[a-z_]\\w*(\\.\\w+|\\[[^\\]]*\\])*\\s*[-+*/%%]?=(?!=)" % autoload
 		patterns.append(RegEx.create_from_string(write))
 
 	for path: String in files:
@@ -180,6 +181,9 @@ func _check_screens(files: Array[String]) -> void:
 			for regex: RegEx in patterns:
 				var found: RegExMatch = regex.search(code)
 				if found == null:
+					continue
+				# `var x: Autoload.thing = …` declares a type; it doesn't write to the autoload.
+				if code.substr(0, found.get_start()).strip_edges(false, true).ends_with(":"):
 					continue
 				var where: String = "%s:%d: screen script does `%s`" % [path, index + 1, found.get_string().strip_edges()]
 				if known:

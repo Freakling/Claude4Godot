@@ -231,6 +231,13 @@ expect_output "leaves GUT-style tests to check.local.sh" "another test framework
 cp "$work/saved-screen" scripts/ui/shop_screen.gd; cp "$work/saved-cfg" tools/check.cfg
 rm -rf addons tests/test_gut_style.gd tests/test_gut_style.gd.uid
 
+# A screen that only names an autoload's inner type isn't writing to the autoload.
+cp scripts/autoload/run_state.gd "$work/saved-state"; cp scripts/ui/shop_screen.gd "$work/saved-screen"
+printf '\nenum Phase { OPEN, CLOSED }\n' >> scripts/autoload/run_state.gd
+printf '\nvar _phase: RunState.Phase = RunState.Phase.OPEN\n' >> scripts/ui/shop_screen.gd
+out="$(bash tools/check.sh 2>&1)"; expect_status "doesn't mistake a type annotation for a write to an autoload" 0 $? "$out"
+cp "$work/saved-state" scripts/autoload/run_state.gd; cp "$work/saved-screen" scripts/ui/shop_screen.gd
+
 out="$(bash tools/check.sh 2>&1)"; expect_status "passes again after the faults are removed" 0 $? "$out"
 
 # --- Stop hook ----------------------------------------------------------------------------------

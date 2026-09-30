@@ -2,6 +2,10 @@
 
 Each entry lists what changed. An entry that requires changes to a game's own files (AGENTS.md, TASKS.md, the GDD) ends with **Upgrade steps**, which onboarding carries out during an upgrade.
 
+## 2.0.1 (2026-09-30)
+
+- The check no longer mistakes a type annotation that names an autoload's inner type, such as `var store: GuildStorage.Store = …`, for a screen writing to the autoload. It also ignores capitalised members, which are types and constants that can't be assigned to. Found while migrating a real game.
+
 ## 2.0.0 (2026-09-30)
 
 A rework of the foundation. It has fewer files to keep in sync, a core that works with any assistant, and rules enforced by tooling instead of by reminders. To migrate a 1.x project, follow `ONBOARDING.md`; it detects 1.x.

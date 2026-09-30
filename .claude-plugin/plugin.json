@@ -1,7 +1,7 @@
 {
   "name": "claude4godot",
   "displayName": "Claude4Godot",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Installs and upgrades the Claude4Godot workflow in a Godot project: you design, the AI builds, and a project check proves it works.",
   "author": {
     "name": "Freakling"
