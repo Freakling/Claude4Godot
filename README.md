@@ -1,6 +1,44 @@
 # Claude4Godot
 
-A drop-in workflow for building Godot games with two Claude agents and one human:
+**Make the game you designed — with AI doing the building, and you staying the designer.**
+
+Claude4Godot is a drop-in workflow for Godot projects. It turns two Claude agents into a small,
+disciplined dev team: one that designs and plans with you, one that writes the code. You keep every
+creative decision; they do the rest, and keep the project organised while they do it.
+
+## Why use it
+
+AI can write a lot of game code quickly. Without structure, that speed tends to go wrong in familiar
+ways:
+
+- **Design drifts.** The AI quietly decides things you never agreed to — a mechanic, a number, a
+  rule — and after a few weeks the game isn't the one you had in mind.
+- **Context gets lost.** Every new session starts from scratch, re-reads everything, and contradicts
+  what was decided last week.
+- **Nobody knows what's real.** Design ideas, half-built features and working systems blur together,
+  so you can't tell what's done, what's broken and what's only planned.
+- **Code turns into a tangle.** Game rules end up inside UI screens, and every change breaks
+  something else.
+- **Costs creep up.** Big models read whole files and run on every small task.
+
+Claude4Godot is built to prevent each of these:
+
+| Problem | What the workflow does |
+|---|---|
+| Design drift | **You decide; the AI proposes.** Agents offer options with a recommendation and write down only what you chose. Anything undecided goes on an *open questions* list instead of being guessed. |
+| Lost context | **Everything important lives in a few plain files** — a design document, a task queue, a map of the code, a router. Any agent in any session picks up exactly where the last one stopped. |
+| "What's real?" | **Each fact lives in one place.** The design doc says what the game *should* be, the task list says what's being built, the system map says what *exists*, and a function checklist lets you verify, rule by rule, that the game does what the design says. |
+| Tangled code | **Built-in architecture rules:** game logic in systems, not screens; all tunable values in data files you edit in the Godot Inspector; placeholder art that's easy to swap later. |
+| Rising cost | **Every task is sized** so it runs on the smallest model that can do it, and agents read only the files a task needs. |
+
+## The goal
+
+To spend your time on the parts only you can do — the ideas, the feel, the decisions, the playtesting
+— while the building, bookkeeping and consistency work happens around you. You play, you notice
+things, you talk them through — and they turn into design changes, then tasks, then working code,
+while the project stays coherent from the first prototype to the finished game.
+
+## Who does what
 
 | Who | Where | Responsible for |
 |---|---|---|
@@ -14,7 +52,8 @@ decisions or picks final balance numbers — those are yours.
 
 The agents coordinate through a small set of plain Markdown files — a design document, a task queue,
 a system map, a router and a set of personas — so either agent can pick up where the other left off,
-and so you always know what's decided, what's open and what's next.
+and so you always know what's decided, what's open and what's next. It works for a brand-new game or
+one already in development.
 
 ---
 
