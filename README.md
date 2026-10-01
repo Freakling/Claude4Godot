@@ -19,16 +19,24 @@ AI writes game code fast. Without structure, that speed goes wrong in familiar w
 
 Your game needs git (`git init` if it has none) and no uncommitted changes. You also need Godot 4.3 or newer, and bash (on Windows it comes with Git for Windows).
 
-**Option 1: the Claude Code plugin.** In Claude Code:
+**Option 1: the skill.** In your game's folder, run:
 
 ```
-/plugin marketplace add Freakling/Claude4Godot
+npx skills add Freakling/Godot-Director
+```
+
+That installs the `godot-director` skill for your assistant (Claude Code, Cursor, Codex and many others; you pick in the prompt). Then ask your assistant to set up Claude4Godot, or in Claude Code run `/godot-director`. The skill fetches Claude4Godot outside your game and runs onboarding.
+
+**Option 2: the Claude Code plugin.** In Claude Code:
+
+```
+/plugin marketplace add Freakling/Godot-Director
 /plugin install claude4godot@claude4godot
 ```
 
-Then open a new Claude Code session in your game's folder (or run `/reload-plugins`), and run `/claude4godot:setup`.
+Then open a new Claude Code session in your game's folder (or run `/reload-plugins`), and run `/claude4godot:godot-director`.
 
-**Option 2: manual install.** Put this repository in your game's root folder, next to `project.godot`, as a folder named `Claude4Godot`. Either run `git clone https://github.com/Freakling/Claude4Godot.git Claude4Godot` there, or download the zip and rename the extracted `Claude4Godot-main` folder. Then ask your assistant:
+**Option 3: manual install.** Put this repository in your game's root folder, next to `project.godot`, as a folder named `Claude4Godot`. Either run `git clone https://github.com/Freakling/Godot-Director.git Claude4Godot` there, or download the zip and rename the extracted `Godot-Director-main` folder. Then ask your assistant:
 
 > Read Claude4Godot/ONBOARDING.md and follow it to install Claude4Godot into this project.
 
@@ -43,7 +51,8 @@ Afterwards, restart Claude Code so the new commands load. Each new clone of the 
 **With another AI assistant:** tell onboarding, and it installs the tool-neutral core only (`--tools none`); you can also keep the Claude adapter alongside. Your assistant reads `AGENTS.md`, which points it to `.claude4godot/rules.md` and the procedures. The check and the git hook work the same for every tool, and for you.
 
 ### Upgrade
-- **Plugin:** run `/plugin marketplace update claude4godot` and then `/plugin update claude4godot@claude4godot`. Start a new session in the game, and run `/claude4godot:setup` again.
+- **Skill:** ask for the skill again (`/godot-director` in Claude Code); it fetches the latest Claude4Godot each time.
+- **Plugin:** run `/plugin marketplace update claude4godot` and then `/plugin update claude4godot@claude4godot`. Start a new session in the game, and run `/claude4godot:godot-director` again.
 - **Manual:** put the new Claude4Godot folder in the game, and ask for ONBOARDING.md again.
 
 Only Claude4Godot's own files are replaced, and your edits to them are kept. When a new version also changes a file you edited, the new version is written next to it as `<file>.c4g-new` for you to merge. Review the result with `git diff`.
@@ -154,7 +163,8 @@ It exits 0 on pass, 1 on fail, and 3 when it can't run. It remembers the last pa
 | `install.sh` | copies the files deterministically, keeps your edits, writes a manifest (`--tools claude\|none`) |
 | `framework/` | installed into each game: the tool-neutral core, plus `.claude/` for Claude Code |
 | `project/` | seeds for the game's own files, copied only when missing |
-| `.claude-plugin/`, `skills/setup/` | the Claude Code plugin (`/claude4godot:setup`) |
+| `skills/godot-director/` | the installer skill, for `npx skills add` and the plugin |
+| `.claude-plugin/` | the Claude Code plugin (`/claude4godot:godot-director`) |
 | `examples/market-day/` | a tiny game that uses the workflow: a worked example, and the self-test's fixture |
 | `examples/scenarios.md` | prompts to try after changing the framework, to check that behaviour still holds |
 | `selftest.sh` | tests the installer, the check and the hooks (`bash selftest.sh [path to Godot]`) |

@@ -6,6 +6,7 @@ The human makes every design and ownership decision; you gather, propose and wri
 
 `$C4G` below is the Claude4Godot folder:
 - With the Claude Code plugin, it's `${CLAUDE_PLUGIN_ROOT}`.
+- With the `godot-director` skill installed through `npx skills add`, it's the clone the skill fetches outside the game.
 - With a manual install, it's the folder this file is in, usually `Claude4Godot/` inside the game.
 
 ## 1. Preconditions and mode

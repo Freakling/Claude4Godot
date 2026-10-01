@@ -9,7 +9,7 @@ This repository is Claude4Godot, the workflow that gets installed into Godot gam
 - **What's where.**
   - `framework/` holds files installed into games and replaced on upgrade. That's the tool-neutral core (`.claude4godot/`, `tools/`, `.githooks/`, `playtesting/README.md`) plus one folder per assistant adapter (`.claude/`).
   - `project/` holds seeds, copied once and then owned by the game.
-  - `.claude-plugin/` and `skills/setup/` make this repository a Claude Code plugin whose only job is running `ONBOARDING.md`.
+  - `skills/godot-director/` is the installer skill: `npx skills add Freakling/Godot-Director` installs it for any assistant (and lists it on skills.sh), and `.claude-plugin/` makes the same skill a Claude Code plugin. Its name avoids "claude", which Anthropic reserves in skill names. Its only job is fetching Claude4Godot and running `ONBOARDING.md`; keep it self-contained, because the skills CLI copies only the skill's own folder.
   - `examples/market-day` is a small game that uses the workflow; the self-test runs against it.
 - **One place per rule.** Rules live in `framework/.claude4godot/rules.md`. Each procedure lives in `framework/.claude4godot/procedures/`, and the adapters only point at it. Install, migration and upgrade are in `ONBOARDING.md`. If you find a rule copied into a second file, delete the copy and link to the original.
 - **Tool-neutral core.** Nothing in `.claude4godot/`, `tools/` or `.githooks/` may depend on one assistant. Tool-specific behaviour belongs in that tool's adapter folder.

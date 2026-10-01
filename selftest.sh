@@ -41,6 +41,12 @@ echo "framework"
 plugin_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1/p' "$src/.claude-plugin/plugin.json")"
 [ "$plugin_version" = "$(tr -d '\r\n' < "$src/VERSION")" ] && ok "plugin.json version matches VERSION" \
   || bad "plugin.json version ($plugin_version) matches VERSION ($(cat "$src/VERSION"))"
+installer="$src/skills/godot-director/SKILL.md"
+if [ -f "$installer" ] && grep -q '^name: godot-director$' "$installer" && grep -q '^description: ' "$installer"     && grep -q 'ONBOARDING.md' "$installer" && grep -q 'git clone' "$installer"     && [ "$(find "$src" -name SKILL.md -not -path "*/.git/*" -mindepth 2 -maxdepth 4 | wc -l)" -eq 1 ]; then
+  ok "the installer skill is the only one the skills CLI finds, and fetches Claude4Godot on its own"
+else
+  bad "skills/godot-director/SKILL.md (name, description, self-contained fetch, only skill found by npx skills add)"
+fi
 cmp -s "$src/LICENSE" "$src/framework/.claude4godot/LICENSE" && ok "the installed LICENSE copy matches LICENSE" \
   || bad "framework/.claude4godot/LICENSE differs from LICENSE"
 missing=""

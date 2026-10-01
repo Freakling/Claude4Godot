@@ -2,6 +2,11 @@
 
 Each entry lists what changed. An entry that requires changes to a game's own files (AGENTS.md, TASKS.md, the GDD) ends with **Upgrade steps**, which onboarding carries out during an upgrade.
 
+## 2.0.2 (2026-10-01)
+- **Install with `npx skills add Freakling/Godot-Director`.** The installer skill is now `skills/godot-director/` (Anthropic reserves "claude" in skill names) and works on its own: it uses the plugin's copy or a `Claude4Godot/` folder when there is one, and otherwise fetches Claude4Godot outside the game. Any assistant the skills CLI supports can install it, and installs list it on skills.sh.
+- **The plugin command is now `/claude4godot:godot-director`** (was `/claude4godot:setup`), because the plugin uses the same skill.
+- **The GitHub repository is now `Freakling/Godot-Director`.** The old address redirects; the install commands and the skill use the new one.
+
 ## 2.0.1 (2026-09-30)
 
 - The check no longer mistakes a type annotation that names an autoload's inner type, such as `var store: GuildStorage.Store = …`, for a screen writing to the autoload. It also ignores capitalised members, which are types and constants that can't be assigned to. Found while migrating a real game.
