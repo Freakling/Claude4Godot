@@ -4,6 +4,6 @@ description: 'Builds one claimed TASKS.md item in a fresh context and reports ba
 tools: Read, Edit, Write, Grep, Glob, Bash
 model: inherit
 ---
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 
-Read `.claude4godot/procedures/build.md` and follow it exactly. The item's ID and full text are in your request.
+Read `.godot-director/procedures/build.md` and follow it exactly. The item's ID and full text are in your request.

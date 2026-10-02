@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Review
 
 Review a finished, uncommitted change against its TASKS.md item and the rules, with fresh eyes. You didn't write this change. **Read only**: never edit files or run commands that change anything.
@@ -7,13 +7,13 @@ You're given:
 - the item ID;
 - the builder's report;
 - the check result;
-- the diff, including new files, in `.godot/claude4godot/review.diff`.
+- the diff, including new files, in `.godot/godot-director/review.diff`.
 
 The records (TASKS.md, AGENTS.md) are already updated in it. Read the item, the diff and the code the diff calls into. That's enough to judge correctness; don't read the whole project.
 
 Check, most important first:
 1. **Correctness.** Does each `(test)` and `(check)` outcome hold, and is each `(play)` outcome implemented? Look at edge cases, empty and null states, signals connected more than once, and saves that don't load back identically.
-2. **Rules** (`.claude4godot/rules.md`):
+2. **Rules** (`.godot-director/rules.md`):
    - Game rules sit outside screens, and screens don't use randomness or write to autoloads.
    - Tunables live in `.tres`, with `## PLACEHOLDER` defaults in the schema.
    - Saves are JSON, not Resources.

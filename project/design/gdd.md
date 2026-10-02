@@ -7,7 +7,7 @@
 - Refer to sections by heading ("GDD › Combat"), never by number. Add a subsection rather than
   growing a long one, and delete sections this game doesn't need.
 - Say what a number is for and how it should feel; the values themselves live in data/*.tres.
-- Engineering conventions live in .claude4godot/rules.md, and project-specific ones in AGENTS.md ›
+- Engineering conventions live in .godot-director/rules.md, and project-specific ones in AGENTS.md ›
   Project rules, not here.
 -->
 

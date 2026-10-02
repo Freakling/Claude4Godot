@@ -1,17 +1,19 @@
 extends SceneTree
-## Claude4Godot project check · framework-owned: replaced on upgrade.
+## Godot Director project check · framework-owned: replaced on upgrade.
 ##
 ## Run it with `bash tools/check.sh`. That wrapper runs the import pass first and afterwards scans
 ## Godot's output for errors this script can't see (a parse error is printed, not returned).
 ## Configure it in res://tools/check.cfg; don't edit this file in a project.
 ##
 ## Steps: load every script, scene and resource · screen scripts hold no game rules · tests.
-## While it runs, Engine.has_meta("claude4godot_check") is true, so autoloads (which run too)
-## can skip reading and writing player data.
+## While it runs, Engine.has_meta("godot_director_check") is true, so autoloads (which run too)
+## can skip reading and writing player data. The 2.x name, "claude4godot_check", is set too until
+## 4.0, so games not yet migrated keep working; it is deprecated.
 
 const CONFIG_PATH: String = "res://tools/check.cfg"
 const TYPED_SETTING: String = "debug/gdscript/warnings/untyped_declaration"
-const CHECK_META: StringName = &"claude4godot_check"
+const CHECK_META: StringName = &"godot_director_check"
+const OLD_CHECK_META: StringName = &"claude4godot_check"   # deprecated: remove in 4.0
 var _failures: PackedStringArray = PackedStringArray()
 var _notes: PackedStringArray = PackedStringArray()
 var _counts: Dictionary = {}
@@ -38,6 +40,7 @@ var _other_test_bases: PackedStringArray = PackedStringArray([
 func _init() -> void:
 	# Before any autoload's _ready runs.
 	Engine.set_meta(CHECK_META, true)
+	Engine.set_meta(OLD_CHECK_META, true)
 
 
 func _initialize() -> void:
@@ -52,7 +55,7 @@ func _on_frame() -> void:
 		_run()
 	elif not _reported:
 		_reported = true
-		printerr("C4G-FAIL: tools/check.gd stopped early; see the error above")
+		printerr("GDIR-FAIL: tools/check.gd stopped early; see the error above")
 		quit(1)
 
 
@@ -83,7 +86,7 @@ func _read_config() -> void:
 	_tests_dir = str(config.get_value("tests", "dir", _tests_dir)).trim_prefix("res://").trim_suffix("/")
 	# tools/check.sh reads these lines and ignores matching output.
 	for pattern: String in _strings(config.get_value("output", "ignore", [])):
-		print("C4G-IGNORE:" + pattern)
+		print("GDIR-IGNORE:" + pattern)
 
 
 func _strings(value: Variant) -> PackedStringArray:
@@ -263,15 +266,15 @@ func _is_other_framework(path: String) -> bool:
 ## One fresh instance per test, so no state leaks from one test to the next.
 func _run_test(test_script: GDScript, path: String, method_name: String) -> void:
 	var instance: Object = test_script.new()
-	if instance == null or not instance.has_method("_c4g_begin"):
+	if instance == null or not instance.has_method("_gdir_begin"):
 		_failures.append("%s: a test file must start with extends \"res://tools/test_case.gd\" and need no _init arguments" % path)
 		return
 	# A runtime error inside a test prints SCRIPT ERROR after this line; check.sh fails on it.
-	print("C4G-TEST: %s::%s" % [path, method_name])
-	instance.call("_c4g_begin")
+	print("GDIR-TEST: %s::%s" % [path, method_name])
+	instance.call("_gdir_begin")
 	instance.call("before_each")
 	var result: Variant = instance.call(method_name)
-	var errors: PackedStringArray = instance.call("_c4g_end")
+	var errors: PackedStringArray = instance.call("_gdir_end")
 	if result is Object and (result as Object).get_class() == "GDScriptFunctionState":
 		errors.append("tests must be synchronous (no await): its checks would run after the check ended")
 	if errors.is_empty():
@@ -286,8 +289,8 @@ func _report() -> void:
 	if int(ProjectSettings.get_setting(TYPED_SETTING, 0)) != 2:
 		_notes.append("statically typed GDScript isn't enforced: set %s=2 in project.godot" % TYPED_SETTING)
 	for note: String in _notes:
-		print("C4G-NOTE: " + note)
-	print("C4G: loaded %s, %s, %s · %s passed · %s scanned" % [
+		print("GDIR-NOTE: " + note)
+	print("GDIR: loaded %s, %s, %s · %s passed · %s scanned" % [
 		_count(int(_counts.get("gd", 0)), "script"),
 		_count(int(_counts.get("tscn", 0)) + int(_counts.get("scn", 0)), "scene"),
 		_count(int(_counts.get("tres", 0)) + int(_counts.get("res", 0)), "resource"),
@@ -295,7 +298,7 @@ func _report() -> void:
 		_count(_screens_scanned, "screen script"),
 	])
 	for failure: String in _failures:
-		printerr("C4G-FAIL: " + failure)
+		printerr("GDIR-FAIL: " + failure)
 	_reported = true
 	quit(0 if _failures.is_empty() else 1)
 

@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Build one item
 
 Build one TASKS.md item that has already been claimed, and report back briefly. Until you've written the report, don't pick items, don't edit TASKS.md, AGENTS.md or `design/`, and don't commit. Whoever handed you the item does that; if that's you, carry on with `next-task.md` afterwards.
@@ -11,7 +11,7 @@ Build one TASKS.md item that has already been claimed, and report back briefly. 
    - you hit a design call the GDD doesn't settle (give 2–4 options and a recommendation);
    - the item needs something it doesn't describe;
    - it would touch much more than its `Touches`.
-4. **Build** by `.claude4godot/rules.md` › Architecture defaults. Write a test for every `(test)` outcome, and a regression test for a bug when it can have one. Stay inside the item.
+4. **Build** by `.godot-director/rules.md` › Architecture defaults. Write a test for every `(test)` outcome, and a regression test for a bug when it can have one. Stay inside the item.
 5. **Verify** with `bash tools/check.sh` (foreground, long timeout), until it exits 0.
    - After two failed attempts at the same problem, stop and report.
    - A failure in files the item doesn't touch, which was there before you started, isn't yours: report `failed: pre-existing` with its lines.

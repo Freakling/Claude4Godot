@@ -1,8 +1,8 @@
 {
-  "name": "claude4godot",
-  "displayName": "Claude4Godot",
-  "version": "2.0.2",
-  "description": "Installs and upgrades the Claude4Godot workflow in a Godot project: you design, the AI builds, and a project check proves it works.",
+  "name": "godot-director",
+  "displayName": "Godot Director",
+  "version": "3.0.0",
+  "description": "Installs and upgrades the Godot Director workflow in a Godot project: you design, the AI builds, and a project check proves it works.",
   "author": {
     "name": "Freakling"
   },

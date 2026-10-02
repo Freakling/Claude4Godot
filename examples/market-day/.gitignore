@@ -4,9 +4,9 @@
 # them so running it doesn't dirty the framework repo.
 *.uid
 
-# Claude4Godot's own files. In a real game they're committed; in this example they're installed
+# Godot Director's own files. In a real game they're committed; in this example they're installed
 # by install.sh (selftest.sh does it), so the framework repo holds only one copy.
-/.claude4godot/
+/.godot-director/
 /.claude/
 /.githooks/
 /tools/check.sh
@@ -15,7 +15,7 @@
 /tools/setup-clone.sh
 /playtesting/README.md
 
-# Claude4Godot
+# Godot Director
 /tools/godot_bin.local
 /.claude/settings.local.json
-*.c4g-new
+*.gdir-new

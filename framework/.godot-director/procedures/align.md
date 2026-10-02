@@ -1,19 +1,19 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Align
 
 A consistency pass across the GDD, decisions, TASKS.md, AGENTS.md, project settings and code. Check everything below, fix what's mechanical, and list what needs the human, with a recommendation for each. Never change design.
 
 1. **Placeholders.** No `{{…}}` left in AGENTS.md, TASKS.md, `design/` or `playtesting/TEMPLATE.md` (`git grep -n "{{" -- AGENTS.md TASKS.md design playtesting/TEMPLATE.md`). The template's loop sections may wait until the core loop is decided, but only if an item for filling them exists.
 2. **Entry files.**
-   - AGENTS.md points to `.claude4godot/rules.md`.
+   - AGENTS.md points to `.godot-director/rules.md`.
    - In Claude Code, CLAUDE.md contains `@AGENTS.md`.
-   - No `*.c4g-new` files are left unmerged: `git ls-files -o -i --exclude-standard -- '*.c4g-new'`.
+   - No `*.gdir-new` files are left unmerged: `git ls-files -o -i --exclude-standard -- '*.gdir-new'`.
 3. **Items.**
    - IDs are unique and below `Next IDs`, and every `Depends on` exists, in TASKS.md or the archive.
    - No `done` item depends on a `todo` one.
    - Every `agent` item has a Size, `Touches`, tagged `Done when` outcomes (or a Repro, for bugs) and a `GDD:` value. That value is an existing heading, or `—` for items that aren't about the design.
    - Every `Q<n>` an item names is still in Open Questions. If it's been answered, update the item.
-   - Items follow `.claude4godot/tasks.md`.
+   - Items follow `.godot-director/tasks.md`.
    - Report `in-progress` items claimed before today.
 4. **Coverage.** Every rule in the GDD is either built (a done item), planned (a todo item), or reported to the human as a gap. Only report the gaps; the human decides which ones become items.
 5. **Architecture.**

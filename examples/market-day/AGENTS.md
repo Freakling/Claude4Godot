@@ -1,8 +1,8 @@
 # Market Day
 
-A five-day grain market in one screen. Each day the price moves; buy low, sell high, and finish with enough gold to win. A tiny example of a game run with Claude4Godot.
+A five-day grain market in one screen. Each day the price moves; buy low, sell high, and finish with enough gold to win. A tiny example of a game run with Godot Director.
 
-Instructions for AI assistants working on this game. The workflow is Claude4Godot: its rules are in `.claude4godot/rules.md`, which names the procedure for each kind of request. Read it before any work, unless your tool has already loaded it (Claude Code imports it: @.claude4godot/rules.md).
+Instructions for AI assistants working on this game. The workflow is Godot Director: its rules are in `.godot-director/rules.md`, which names the procedure for each kind of request. Read it before any work, unless your tool has already loaded it (Claude Code imports it: @.godot-director/rules.md).
 
 ## Project facts
 - Godot 4.3+ · GDScript · 2D (UI only) · desktop

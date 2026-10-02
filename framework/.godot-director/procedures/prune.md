@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Prune
 
 Keep the queue short to read.

@@ -1,8 +1,8 @@
 * text=auto eol=lf
-# Claude4Godot
+# Godot Director
 *.sh text eol=lf
 /.githooks/** text eol=lf
-/.claude4godot/** text eol=lf
+/.godot-director/** text eol=lf
 /.claude/** text eol=lf
 /tools/check.gd text eol=lf
 /tools/test_case.gd text eol=lf

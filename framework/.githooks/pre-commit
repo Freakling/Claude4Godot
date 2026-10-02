@@ -1,13 +1,13 @@
 #!/usr/bin/env bash
-# Claude4Godot pre-commit hook · framework-owned: replaced on upgrade.
+# Godot Director pre-commit hook · framework-owned: replaced on upgrade.
 # `bash tools/setup-clone.sh` installs a small hook in .git/hooks that runs this file.
 #
 # Runs the project check when the commit includes code, scenes or data. It checks the working
 # tree, so commit what you checked (partially staged files aren't checked separately).
 
-if [ -n "$(git ls-files -o -i --exclude-standard -- '*.c4g-new' 2>/dev/null)" ]; then
-  echo "pre-commit: unmerged Claude4Godot upgrade files (*.c4g-new) exist. Merge them, then delete them:"
-  git ls-files -o -i --exclude-standard -- '*.c4g-new' | sed 's/^/  /'
+if [ -n "$(git ls-files -o -i --exclude-standard -- '*.gdir-new' 2>/dev/null)" ]; then
+  echo "pre-commit: unmerged Godot Director upgrade files (*.gdir-new) exist. Merge them, then delete them:"
+  git ls-files -o -i --exclude-standard -- '*.gdir-new' | sed 's/^/  /'
   exit 1
 fi
 [ -f project.godot ] && [ -f tools/check.sh ] || exit 0   # no Godot project yet: nothing to check

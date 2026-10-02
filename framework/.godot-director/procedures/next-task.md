@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Next task
 
 Pick the next ready item in `TASKS.md` (or the one the human named), have it built, prove it with the check, update the records, and commit it with the human's approval.
@@ -26,7 +26,7 @@ Set the item to `in-progress YYYY-MM-DD` (today).
 
 ## 3. Build
 - **In Claude Code,** give the `builder` subagent the item's ID and full text. Run it in the foreground (`run_in_background: false`), and never run two builders at once: they would edit, and check, each other's files.
-  1. Before starting it, create the file `.godot/claude4godot/building`. Delete it when the report arrives; while it exists, the Stop hook leaves the half-built files alone.
+  1. Before starting it, create the file `.godot/godot-director/building`. Delete it when the report arrives; while it exists, the Stop hook leaves the half-built files alone.
   2. The builder runs on the session model. If AGENTS.md › Project rules turn on model sizing, pass `model: haiku` for an `S` item.
 - **Other tools:** follow `build.md` yourself, or in a subagent if your tool has them.
 - **A rebuild** (after a failure, a blocked report or review findings) gets the previous report, anything the human said about the item, and word that the earlier attempt's edits are still in the tree to continue from.
@@ -46,12 +46,12 @@ From the report:
 - Set the item to `done`, and delete its `Note:` if it has one.
 - `Systems:` → AGENTS.md › Architecture.
 - A milestone finished or changed → its row in TASKS.md › Milestones.
-- `Found:` → new items, in the format in `.claude4godot/tasks.md` (IDs from `Next IDs`, then bump it).
+- `Found:` → new items, in the format in `.godot-director/tasks.md` (IDs from `Next IDs`, then bump it).
 - Name any difference from `Touches` in your report to the human.
 
 ## 6. Review
 Only when `rules.md` › Reviews and model size calls for one, judged from the item's size and the report's `API/saves:` line.
-1. Make new files show up in the diff with `git add -N <new files>`, then write it: `git diff HEAD > .godot/claude4godot/review.diff`.
+1. Make new files show up in the diff with `git add -N <new files>`, then write it: `git diff HEAD > .godot/godot-director/review.diff`.
 2. Ask for a review following `review.md`; in Claude Code, that's the `reviewer` subagent. Give it the item ID, the builder's report and the check result.
 3. Code findings that are in scope: rebuild with the findings. Record findings: fix them yourself. Everything else becomes new items.
 4. Review again only if the fixes were substantial.

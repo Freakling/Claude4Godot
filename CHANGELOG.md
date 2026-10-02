@@ -2,6 +2,30 @@
 
 Each entry lists what changed. An entry that requires changes to a game's own files (AGENTS.md, TASKS.md, the GDD) ends with **Upgrade steps**, which onboarding carries out during an upgrade.
 
+## 3.0.0 (2026-10-02)
+
+**Claude4Godot is now Godot Director.** Everything that carried the old name is renamed; nothing else changes in how the workflow works.
+
+- **Framework folder:** `.claude4godot/` is now `.godot-director/` (rules, procedures, `tasks.md`, `LICENSE`, `manifest`). The manifest header reads `# godot-director <version>`.
+- **Upgrade files:** `<file>.c4g-new` is now `<file>.gdir-new`.
+- **Runtime state:** the check's logs and state, the builder's marker and the review diff moved from `.godot/claude4godot/` to `.godot/godot-director/`.
+- **Check meta:** while the check runs, `Engine.has_meta("godot_director_check")` is true. The old name, `claude4godot_check`, is still set during 3.x so games that haven't migrated keep working; it is deprecated and will be removed in 4.0.
+- **Stop hook switch:** `CLAUDE4GODOT_STOP_CHECK=0` is now `GODOT_DIRECTOR_STOP_CHECK=0`.
+- **Check output markers:** `C4G-FAIL`, `C4G-NOTE`, `C4G-IGNORE` are now `GDIR-FAIL`, `GDIR-NOTE`, `GDIR-IGNORE`. A test that expects an error prints `GDIR-IGNORE:<text>`; `C4G-IGNORE:` is still accepted during 3.x, deprecated, and will be removed in 4.0.
+- **Plugin and marketplace:** both are `godot-director`. Install with `/plugin marketplace add Freakling/Godot-Director` and `/plugin install godot-director@godot-director`; the command is `/godot-director:godot-director`.
+- **Manual install folder:** `Godot-Director/` in the game (was `Claude4Godot/`). The skill fetches into `${TMPDIR:-/tmp}/godot-director`.
+- **`install.sh` migrates a 2.x install by itself.** When it finds `.claude4godot/manifest`, it moves `.claude4godot/` to `.godot-director/` (with `git mv` when the files are tracked), carries the manifest over so your edits to framework files are still recognised, renames leftover `*.c4g-new` files to `*.gdir-new`, updates the lines 2.x added to `.gitignore` and `.gitattributes`, updates this clone's pre-commit shim, and deletes `.godot/claude4godot/`. `tools/setup-clone.sh` replaces a 2.x shim in other clones.
+- Onboarding detects an upgrade from either manifest.
+
+**Upgrade steps**
+1. In `AGENTS.md`, replace `.claude4godot/` with `.godot-director/` (the line that points to `rules.md`, and its `@.claude4godot/rules.md` import), and "Claude4Godot" with "Godot Director". Do the same in `CLAUDE.md` if it names either.
+2. Do the same in the game's other files that mention them: the item-format line in `TASKS.md`, the conventions line in `design/gdd.md`, the header comment in `tools/check.cfg`, and the README's development section if it has one. Find them with `git grep -n -e claude4godot -e Claude4Godot -e CLAUDE4GODOT -e C4G- -e c4g-new` (a plain `c4g` also matches Godot uids). Leave history as it is: processed playtest reports, `design/decisions.md`, `TASKS-archive.md` and done items.
+3. Replace `claude4godot_check` with `godot_director_check` in the game's own scripts: autoloads that guard player-data IO check `Engine.has_meta("godot_director_check")`, and so do tests of that guard. Likewise replace `C4G-IGNORE:` with `GDIR-IGNORE:` in tests that print it to expect an error. Run the check afterwards.
+4. If `CLAUDE4GODOT_STOP_CHECK` is set in `.claude/settings.json` (or, per machine, `.claude/settings.local.json`; tell the human), rename it to `GODOT_DIRECTOR_STOP_CHECK`.
+5. A manual-install `Claude4Godot/` folder inside the game: offer to delete it, and replace `/Claude4Godot/` in `.git/info/exclude` with the new folder's name if one is kept.
+6. Tell the human: plugin users remove the old marketplace (`/plugin marketplace remove claude4godot`) and install again with the commands above; every other clone runs `bash tools/setup-clone.sh` once, which updates its pre-commit hook (the check notes it until then).
+7. Commit with the moved folder staged as a rename (`git add -A -- .claude4godot .godot-director`).
+
 ## 2.0.2 (2026-10-01)
 - **Install with `npx skills add Freakling/Godot-Director`.** The installer skill is now `skills/godot-director/` (Anthropic reserves "claude" in skill names) and works on its own: it uses the plugin's copy or a `Claude4Godot/` folder when there is one, and otherwise fetches Claude4Godot outside the game. Any assistant the skills CLI supports can install it, and installs list it on skills.sh.
 - **The plugin command is now `/claude4godot:godot-director`** (was `/claude4godot:setup`), because the plugin uses the same skill.

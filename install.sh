@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
-# Claude4Godot installer: installs the workflow into a Godot project, or upgrades it.
+# Godot Director installer: installs the workflow into a Godot project, or upgrades it.
 #
-#   bash /path/to/Claude4Godot/install.sh [--tools claude|none] [--force] [project folder]
+#   bash /path/to/Godot-Director/install.sh [--tools claude|none] [--force] [project folder]
 #
 # The project folder defaults to the current one and must be the root of a git repository
 # (--force skips that check). --tools picks the assistant adapters: `claude` (the default, and what
@@ -9,12 +9,14 @@
 #
 # - framework/ is framework-owned and is copied on every run. A file you changed locally stays as
 #   it is. If this version changes that file too, the new version is written next to it as
-#   <file>.c4g-new for you to merge.
+#   <file>.gdir-new for you to merge.
 # - project/ holds project-owned seeds, copied only when missing. They're yours from then on.
 # - Framework files an earlier version installed but this one no longer ships are deleted, unless
 #   you changed them.
-# - .gitignore and .gitattributes get the lines Claude4Godot needs.
-# - What was installed is recorded in .claude4godot/manifest (commit it).
+# - .gitignore and .gitattributes get the lines Godot Director needs.
+# - What was installed is recorded in .godot-director/manifest (commit it).
+# - A 2.x install (then called Claude4Godot: .claude4godot/, *.c4g-new) is first moved to the new
+#   names, keeping its manifest, so your edits are still recognised.
 # Nothing is committed. Review with `git status` and `git diff`, then follow ONBOARDING.md.
 #
 # Adapter files are the tool's own paths: for Claude Code, `.claude/…` and `CLAUDE.md`. To add
@@ -46,7 +48,7 @@ done
 src="$(cd "$(dirname "$0")" && pwd)"
 dest="$(cd "$target" && pwd)"
 if [ "$src" = "$dest" ]; then
-  echo "install: give the game project's folder, not the Claude4Godot folder." >&2
+  echo "install: give the game project's folder, not the Godot Director folder." >&2
   exit 1
 fi
 command -v git >/dev/null 2>&1 || { echo "install: git is required." >&2; exit 1; }
@@ -62,21 +64,73 @@ if [ "$force" -eq 0 ]; then
   fi
 fi
 if grep -rlq "$(printf '\r')" "$src/framework" "$src/project" 2>/dev/null; then
-  echo "install: Claude4Godot's files have CRLF line endings. Check the folder out again with LF" >&2
+  echo "install: Godot Director's files have CRLF line endings. Check the folder out again with LF" >&2
   echo "         (its .gitattributes asks for LF), or convert them, then rerun." >&2
   exit 1
 fi
 
 version="$(tr -d '\r\n' < "$src/VERSION")"
-manifest_rel=".claude4godot/manifest"
+manifest_rel=".godot-director/manifest"
 tmp="$(mktemp -d)"
 trap 'rm -rf "$tmp"' EXIT
+
+# --- migrate a 2.x install (then called Claude4Godot) ---------------------------------------------
+# 2.x kept its files in .claude4godot/ and wrote <file>.c4g-new. Move them to the new names before
+# anything else, and rewrite the manifest's paths, so local edits are still recognised as edits.
+migrated=""
+if [ -f "$dest/.claude4godot/manifest" ]; then
+  if [ -e "$dest/.godot-director" ]; then
+    echo "install: both .claude4godot/ and .godot-director/ exist. Move anything you need out of" >&2
+    echo "         .claude4godot/ (its manifest belongs to the older install), delete it, then rerun." >&2
+    exit 1
+  fi
+  if [ -n "$(git -C "$dest" ls-files -- .claude4godot 2>/dev/null | head -n 1)" ]; then
+    git -C "$dest" mv .claude4godot .godot-director
+  else
+    mv "$dest/.claude4godot" "$dest/.godot-director"
+  fi
+  tr -d '\r' < "$dest/$manifest_rel" \
+    | sed -e 's/^# claude4godot /# godot-director /' -e "s|$tab\.claude4godot/|$tab.godot-director/|" > "$tmp/migrated"
+  cp "$tmp/migrated" "$dest/$manifest_rel"
+  migrated="$nl    moved .claude4godot/ to .godot-director/"
+  # Unmerged upgrade files: <file>.c4g-new → <file>.gdir-new.
+  (cd "$dest" && "$FIND" . \( -name .git -o -name .godot \) -prune -o -type f -name '*.c4g-new' -print) > "$tmp/c4g-new"
+  while IFS= read -r file; do
+    [ -n "$file" ] || continue
+    new="${file%.c4g-new}.gdir-new"
+    mv "$dest/$file" "$dest/$new"
+    migrated="$migrated$nl    renamed ${file#./} to ${new#./}"
+  done < "$tmp/c4g-new"
+  # The lines 2.x added to .gitignore and .gitattributes.
+  for file in .gitignore .gitattributes; do
+    [ -f "$dest/$file" ] || continue
+    awk '{
+      cr = sub(/\r$/, "") ? "\r" : ""
+      if ($0 == "# Claude4Godot") $0 = "# Godot Director"
+      gsub(/\.claude4godot\//, ".godot-director/"); gsub(/\.c4g-new/, ".gdir-new")
+      printf "%s%s\n", $0, cr
+    }' "$dest/$file" > "$tmp/lines"
+    if ! cmp -s "$tmp/lines" "$dest/$file"; then
+      cp "$tmp/lines" "$dest/$file"; migrated="$migrated$nl    updated the Claude4Godot lines in $file"
+    fi
+  done
+  # This clone's pre-commit shim from tools/setup-clone.sh names the old product.
+  if hooks_dir="$(cd "$dest" && git rev-parse --git-path hooks 2>/dev/null)"; then
+    hook="$dest/$hooks_dir/pre-commit"
+    case "$hooks_dir" in /*|[A-Za-z]:*) hook="$hooks_dir/pre-commit" ;; esac
+    if [ -f "$hook" ] && grep -q '^# Claude4Godot: runs the project' "$hook"; then
+      sed 's/^# Claude4Godot: runs the project/# Godot Director: runs the project/' "$hook" > "$tmp/hook"
+      cat "$tmp/hook" > "$hook"; migrated="$migrated$nl    updated this clone's pre-commit hook"
+    fi
+  fi
+  rm -rf "$dest/.godot/claude4godot"   # the old check's logs and state; tools/check.sh rebuilds them
+fi
 
 : > "$tmp/old"
 old_version=""; old_tools=""
 if [ -f "$dest/$manifest_rel" ]; then
   tr -d '\r' < "$dest/$manifest_rel" > "$tmp/manifest"
-  old_version="$(sed -n 's/^# claude4godot //p' "$tmp/manifest" | head -n 1)"
+  old_version="$(sed -n 's/^# godot-director //p' "$tmp/manifest" | head -n 1)"
   old_tools="$(sed -n 's/^# tools //p' "$tmp/manifest" | head -n 1)"
   grep -v '^#' "$tmp/manifest" > "$tmp/old" || true
 fi
@@ -101,7 +155,7 @@ list_files() {
 # In the game, git's own filters apply, so a CRLF checkout (core.autocrlf) hashes like LF.
 # Inside a git repository, --stdin-paths reads paths from the repository root, not the current
 # folder, so the paths get the folder's prefix and git runs at the root. That covers the
-# Claude4Godot folder being a clone, or sitting inside the game.
+# Godot Director folder being a clone, or sitting inside the game.
 hash_paths() {
   if [ -s "$2" ]; then
     local prefix top
@@ -138,7 +192,7 @@ hash_paths "$dest" "$tmp/present" filters > "$tmp/current"
 # same     already this version
 # update   unchanged since the last install: replace it
 # keep     changed locally, but this version doesn't change it either: leave it
-# conflict changed locally and changed in this version: write <file>.c4g-new
+# conflict changed locally and changed in this version: write <file>.gdir-new
 # remove / left   no longer shipped: delete it if unchanged, otherwise leave it
 awk -F'\t' -v OFS='\t' '
   FILENAME == ARGV[1] { old[$2] = $1; next }
@@ -167,7 +221,7 @@ while IFS="$tab" read -r action rel; do
     update)   printf '%s\n' "$rel" >> "$tmp/copy"; updated_count=$((updated_count + 1)) ;;
     same)     same_count=$((same_count + 1)) ;;
     keep)     kept_local="$kept_local$nl    $rel" ;;
-    conflict) cp "$src/framework/$rel" "$dest/$rel.c4g-new"; conflicts="$conflicts$nl    $rel" ;;
+    conflict) cp "$src/framework/$rel" "$dest/$rel.gdir-new"; conflicts="$conflicts$nl    $rel" ;;
     remove)   rm -f "$dest/$rel" "$dest/$rel.uid"; removed="$removed$nl    $rel" ;;   # .uid: Godot 4.4+
     left)     left="$left$nl    $rel" ;;
   esac
@@ -175,7 +229,7 @@ done < "$tmp/plan"
 copy_list "$src/framework" "$dest" "$tmp/copy"
 
 mkdir -p "$dest/${manifest_rel%/*}"
-{ printf '# claude4godot %s\n# tools %s\n' "$version" "$tools"; cat "$tmp/new"; } > "$dest/$manifest_rel"
+{ printf '# godot-director %s\n# tools %s\n' "$version" "$tools"; cat "$tmp/new"; } > "$dest/$manifest_rel"
 
 # --- project-owned seeds --------------------------------------------------------------------------
 : > "$tmp/seeds"
@@ -208,31 +262,32 @@ ensure_lines() { # ensure_lines <file> <line>…
     case "$nl$content$nl" in *"$nl$line$nl"*) continue ;; esac
     if [ "$added" -eq 0 ]; then
       if [ -s "$file" ] && [ -n "$(tail -c 1 "$file")" ]; then echo >> "$file"; fi
-      echo "# Claude4Godot" >> "$file"
+      echo "# Godot Director" >> "$file"
       added=1
     fi
     echo "$line" >> "$file"
   done
 }
-ensure_lines "$dest/.gitignore" ".godot/" "/tools/godot_bin.local" "/.claude/settings.local.json" "*.c4g-new"
-# LF everywhere Claude4Godot writes: bash can't run CRLF scripts, and upgrades compare contents.
-ensure_lines "$dest/.gitattributes" "*.sh text eol=lf" "/.githooks/** text eol=lf" "/.claude4godot/** text eol=lf" \
+ensure_lines "$dest/.gitignore" ".godot/" "/tools/godot_bin.local" "/.claude/settings.local.json" "*.gdir-new"
+# LF everywhere Godot Director writes: bash can't run CRLF scripts, and upgrades compare contents.
+ensure_lines "$dest/.gitattributes" "*.sh text eol=lf" "/.githooks/** text eol=lf" "/.godot-director/** text eol=lf" \
   "/.claude/** text eol=lf" "/tools/check.gd text eol=lf" "/tools/test_case.gd text eol=lf" "/playtesting/README.md text eol=lf"
 
 # --- report ---------------------------------------------------------------------------------------
 if [ -z "$old_version" ]; then action="installed $version"
 elif [ "$old_version" = "$version" ]; then action="$version reinstalled"
 else action="upgraded from $old_version to $version"; fi
-echo "Claude4Godot $action in $dest (tools: $tools)"
+echo "Godot Director $action in $dest (tools: $tools)"
+if [ -n "$migrated" ]; then echo "  migrated from the 2.x names (Claude4Godot):$migrated"; fi
 echo "  framework files: $new_count new, $updated_count updated, $same_count unchanged"
 if [ -n "$kept_local" ]; then echo "  kept your changes (this version doesn't change these files):$kept_local"; fi
 if [ -n "$seeded" ]; then echo "  project files created:$seeded"; fi
 if [ -n "$kept" ]; then echo "  project files kept (they already existed):$kept"; fi
-if [ -n "$removed" ]; then echo "  removed (no longer part of Claude4Godot):$removed"; fi
-if [ -n "$left" ]; then echo "  no longer part of Claude4Godot but changed locally, so left in place:$left"; fi
+if [ -n "$removed" ]; then echo "  removed (no longer part of Godot Director):$removed"; fi
+if [ -n "$left" ]; then echo "  no longer part of Godot Director but changed locally, so left in place:$left"; fi
 if [ -n "$conflicts" ]; then
   echo "  CONFLICTS: you changed these and so does this version. The new version is next to each as"
-  echo "  <file>.c4g-new; merge it, then delete it:$conflicts"
+  echo "  <file>.gdir-new; merge it, then delete it:$conflicts"
 fi
 echo "Next: review with git status / git diff, then follow $src/ONBOARDING.md."
 exit 0

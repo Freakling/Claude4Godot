@@ -1,12 +1,12 @@
 extends RefCounted
-## Base for Claude4Godot tests · framework-owned: overwritten on upgrade.
+## Base for Godot Director tests · framework-owned: overwritten on upgrade.
 ##
 ## A test file is res://tests/**/test_*.gd (folder set in tools/check.cfg) that starts with
 ##     extends "res://tools/test_case.gd"
 ## and has synchronous methods named test_*() -> void. `bash tools/check.sh` runs every one.
 ## Game rules live in RefCounted classes, so a test builds them directly — no scene tree needed.
 
-var _c4g_errors: PackedStringArray = PackedStringArray()
+var _gdir_errors: PackedStringArray = PackedStringArray()
 
 
 ## Override to set up fresh state before each test.
@@ -41,17 +41,17 @@ func expect_near(actual: float, expected: float, tolerance: float = 0.0001, mess
 
 
 func fail(message: String) -> void:
-	_c4g_errors.append(message)
+	_gdir_errors.append(message)
 
 
 # --- used by tools/check.gd ---------------------------------------------------------------------
 
-func _c4g_begin() -> void:
-	_c4g_errors = PackedStringArray()
+func _gdir_begin() -> void:
+	_gdir_errors = PackedStringArray()
 
 
-func _c4g_end() -> PackedStringArray:
-	return _c4g_errors
+func _gdir_end() -> PackedStringArray:
+	return _gdir_errors
 
 
 func _same(a: Variant, b: Variant) -> bool:

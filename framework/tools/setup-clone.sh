@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude4Godot per-clone setup · framework-owned: replaced on upgrade.
+# Godot Director per-clone setup · framework-owned: replaced on upgrade.
 #
 #   bash tools/setup-clone.sh [path to Godot]              Godot path + pre-commit hook
 #   bash tools/setup-clone.sh --skip-hook [path to Godot]  only the Godot path
@@ -76,7 +76,7 @@ if ! git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
 fi
 hooks_path="$(git config --get core.hooksPath)"
 if [ "${hooks_path%/}" = ".githooks" ]; then
-  # Claude4Godot 1.x setups: .githooks/pre-commit already runs, but other hooks (Git LFS) don't.
+  # Godot Director 1.x setups: .githooks/pre-commit already runs, but other hooks (Git LFS) don't.
   echo "setup: core.hooksPath=.githooks runs the pre-commit hook directly. To keep other hooks such as"
   echo "       Git LFS working, run 'git config --unset core.hooksPath' yourself, then run this again."
   exit 0
@@ -87,15 +87,16 @@ elif [ -n "$hooks_path" ]; then
 fi
 hooks_dir="$(git rev-parse --git-path hooks)"
 hook="$hooks_dir/pre-commit"
-if [ -f "$hook" ] && ! grep -q "Claude4Godot" "$hook"; then
-  echo "setup: $hook already exists and isn't Claude4Godot's."
+# A hook installed by 2.x, under the old name Claude4Godot, is replaced too (until 4.0).
+if [ -f "$hook" ] && ! grep -qE "Godot Director|Claude4Godot" "$hook"; then
+  echo "setup: $hook already exists and isn't Godot Director's."
   echo "       Add this line to it: bash .githooks/pre-commit || exit 1"
   exit 4
 fi
 mkdir -p "$hooks_dir"
 cat > "$hook" <<'HOOK'
 #!/usr/bin/env bash
-# Claude4Godot: runs the project's committed pre-commit hook. Installed by tools/setup-clone.sh.
+# Godot Director: runs the project's committed pre-commit hook. Installed by tools/setup-clone.sh.
 root="$(git rev-parse --show-toplevel)" || exit 1
 [ -f "$root/.githooks/pre-commit" ] || exit 0
 exec bash "$root/.githooks/pre-commit" "$@"

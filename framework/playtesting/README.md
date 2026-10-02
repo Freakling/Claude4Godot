@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Playtesting
 
 Two kinds of session feed the game's design and its bug list:

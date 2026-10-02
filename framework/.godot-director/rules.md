@@ -1,8 +1,8 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. Project-specific rules go in
+<!-- Godot Director · framework-owned: replaced on upgrade. Project-specific rules go in
 AGENTS.md › Project rules, and win over these defaults. -->
-# Claude4Godot workflow rules
+# Godot Director workflow rules
 
-These rules apply to any AI assistant working in this project. For each of these requests, follow the procedure in `.claude4godot/procedures/`:
+These rules apply to any AI assistant working in this project. For each of these requests, follow the procedure in `.godot-director/procedures/`:
 - **next-task.md:** do the next task(s), or a named item (T12, B3). The build itself is `build.md`.
 - **design.md:** brainstorm, open design questions, change the design.
 - **playtest.md:** new playtest, process a playtest.
@@ -26,7 +26,7 @@ In Claude Code these are also slash commands, and builds and reviews run as the 
 | What's undecided | GDD › Open Questions (`Q<n>`) |
 | Why a design decision was made | `design/decisions.md` (append-only) |
 | Which systems exist and what each owns | `AGENTS.md` › Architecture |
-| Work, bugs, milestones | `TASKS.md` (format: `.claude4godot/tasks.md`; done items: `TASKS-archive.md`) |
+| Work, bugs, milestones | `TASKS.md` (format: `.godot-director/tasks.md`; done items: `TASKS-archive.md`) |
 | Tunable values | `.tres` files (folders in AGENTS.md › Layout) |
 | Whether it works | `bash tools/check.sh` |
 
@@ -36,7 +36,7 @@ Update the owning place in the same change that makes it untrue. Replace superse
 - **Rule classes.** Game rules live in plain classes (`extends RefCounted`) that receive their data and don't touch the scene tree, so tests can build them directly. Autoloads hold the current state, call rule classes and emit signals. Each script owns one system; split a script that grows a second one.
 - **Screens.** Screens show state and call system methods. They never roll random numbers or assign to autoload variables; the check fails if they do (screen folders are set in `tools/check.cfg`). Cosmetic randomness, such as screen shake or tips, goes in a helper outside the screen folders.
 - **Tunables.** Tunables are `@export` fields on a Resource schema. A new one gets a placeholder default marked in the schema, `@export var drain_rate: float = 1.0 ## PLACEHOLDER`, and is never hand-picked as final. Don't put labels inside `.tres` files; Godot rewrites them on save.
-- **Saves and settings.** They're plain data: `to_dict()`/`from_dict()` as JSON in `user://` (JSON numbers come back as floats; cast them). Never load `.tres`/`.res`, `ConfigFile` or `str_to_var` data from `user://` or any file a player can edit: those formats can instantiate scripts. The check runs autoloads, so an autoload must not read or write player data while `Engine.has_meta("claude4godot_check")` is true.
+- **Saves and settings.** They're plain data: `to_dict()`/`from_dict()` as JSON in `user://` (JSON numbers come back as floats; cast them). Never load `.tres`/`.res`, `ConfigFile` or `str_to_var` data from `user://` or any file a player can edit: those formats can instantiate scripts. The check runs autoloads, so an autoload must not read or write player data while `Engine.has_meta("godot_director_check")` is true.
 - **UI.** Use Containers and anchors; no hard-coded pixel positions for Controls.
 - **Placeholder art.** Use Godot primitives and flat colours under a node named `Visual`, so production art replaces it without restructuring the scene. No external models, textures or audio unless the human asks.
 - **Debug-only tools.** Gate them on `OS.is_debug_build() or OS.has_feature("dev_tools")`. Release export presets don't set `dev_tools` and exclude the tools' folder. To see live state, use the editor's Remote scene tree instead of building an inspector.
@@ -44,7 +44,7 @@ Update the owning place in the same change that makes it untrue. Replace superse
 
 ## Doing the work
 - **Where work comes from.** `TASKS.md`, or straight from the human. A direct request that won't be finished this session, or that turns up follow-up work, gets a TASKS.md item. Work you discover always becomes a new item; never do it silently as part of another.
-- **Read what the work needs:** the item's `Touches`, the Architecture rows, and the GDD sections it names. Read by heading or line range, not whole files. Quote only the relevant lines of logs; the full check logs are in `.godot/claude4godot/`.
+- **Read what the work needs:** the item's `Touches`, the Architecture rows, and the GDD sections it names. Read by heading or line range, not whole files. Quote only the relevant lines of logs; the full check logs are in `.godot/godot-director/`.
 - **Stay inside the item.** Prefer the smallest change, and delete dead code. Match existing patterns; a new pattern needs a reason in the commit message.
 - **Tests.** A rule that can be checked without a screen gets a test: `tests/**/test_*.gd`, `extends "res://tools/test_case.gd"`, synchronous methods `test_*()`. A fixed bug gets a regression test when it can have one; otherwise it goes into the next function check.
 - **Outcome tags.** Each outcome in `Done when` is tagged:

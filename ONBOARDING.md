@@ -1,42 +1,42 @@
-# Claude4Godot onboarding (for the AI assistant)
+# Godot Director onboarding (for the AI assistant)
 
-Follow these steps to install Claude4Godot into a Godot project, upgrade it, or migrate a project from Claude4Godot 1.x. Work from a session opened in the game's root folder, where `project.godot` is (or will be). You need to be able to run bash; on Windows, Git Bash.
+Follow these steps to install Godot Director into a Godot project, upgrade it, or migrate a project from Godot Director 1.x. Work from a session opened in the game's root folder, where `project.godot` is (or will be). You need to be able to run bash; on Windows, Git Bash.
 
 The human makes every design and ownership decision; you gather, propose and write. Ask choices as multiple-choice questions when your tool supports them.
 
-`$C4G` below is the Claude4Godot folder:
+`$GDIR` below is the Godot Director folder:
 - With the Claude Code plugin, it's `${CLAUDE_PLUGIN_ROOT}`.
 - With the `godot-director` skill installed through `npx skills add`, it's the clone the skill fetches outside the game.
-- With a manual install, it's the folder this file is in, usually `Claude4Godot/` inside the game.
+- With a manual install, it's the folder this file is in, usually `Godot-Director/` inside the game.
 
 ## 1. Preconditions and mode
 1. **Git.** The project must be a git repository. If it isn't, ask to run `git init`.
-2. **Manual install inside the game:** if `$C4G` is inside the project, add its relative path (e.g. `/Claude4Godot/`) to the file `git rev-parse --git-path info/exclude` names. Do it now, before any commit. That keeps it out of `git status`, the commits, the hooks and the check.
-3. **Clean tree.** A new repository with files in it: commit them as they are first, so the install is one reviewable diff. Otherwise there must be no uncommitted changes (apart from the Claude4Godot folder itself); ask the human to commit or stash them first.
+2. **Manual install inside the game:** if `$GDIR` is inside the project, add its relative path (e.g. `/Godot-Director/`) to the file `git rev-parse --git-path info/exclude` names. Do it now, before any commit. That keeps it out of `git status`, the commits, the hooks and the check.
+3. **Clean tree.** A new repository with files in it: commit them as they are first, so the install is one reviewable diff. Otherwise there must be no uncommitted changes (apart from the Godot Director folder itself); ask the human to commit or stash them first.
 4. **Godot editor closed.** Ask the human to close the editor for this project during setup, since it rewrites `project.godot`.
 5. **Mode.** Tell the human which mode you detected, and let them confirm:
-   - **upgrade:** `.claude4godot/manifest` exists.
+   - **upgrade:** `.godot-director/manifest` exists, or `.claude4godot/manifest` (a 2.x install, from before Godot Director was renamed; `install.sh` moves it to the new names).
    - **migrate from 1.x:** `.promptx/personas/` or `playtesting/FUNCTION_CHECK.md` exists. An `AGENTS.md` alone isn't proof, since many projects have one.
-   - **existing game:** `project.godot` and scripts, without Claude4Godot.
+   - **existing game:** `project.godot` and scripts, without Godot Director.
    - **fresh start:** no `project.godot`, or an empty project.
 6. **Assistant adapters.** For a first install, ask which assistants will work on the game. The answer is `claude`, the default, or `none` for other assistants only; the core works through `AGENTS.md`, which most assistants read. An upgrade keeps the earlier choice.
 
 ## 2. Install the files
-Run `bash "$C4G/install.sh" --tools <claude|none> .` for a first install. For an upgrade, run `bash "$C4G/install.sh" .` without `--tools`. Then read its report.
-- **`CONFLICTS`** (`<file>.c4g-new`) mean the project already had its own version of a framework file:
-  - `.claude/settings.json`: merge it, keeping the project's permissions, hooks and env and adding Claude4Godot's.
+Run `bash "$GDIR/install.sh" --tools <claude|none> .` for a first install. For an upgrade, run `bash "$GDIR/install.sh" .` without `--tools`. Then read its report.
+- **`CONFLICTS`** (`<file>.gdir-new`) mean the project already had its own version of a framework file:
+  - `.claude/settings.json`: merge it, keeping the project's permissions, hooks and env and adding Godot Director's.
   - Files left over from 1.x (migrate mode): take the new version.
   - Anything else: show the human the difference and ask.
 
-  Delete each `.c4g-new` file once it's merged.
+  Delete each `.gdir-new` file once it's merged.
 - **"project files kept"** means the project already had that file.
   - In migrate mode, step 5 rewrites these.
-  - Otherwise, bring each one into the shape of `$C4G/project/<same file>`:
+  - Otherwise, bring each one into the shape of `$GDIR/project/<same file>`:
     - `CLAUDE.md` must contain the line `@AGENTS.md`, at the top. Move instructions meant for every assistant into AGENTS.md.
-    - `AGENTS.md` keeps its content, gains the missing sections, and gets the line that points to `.claude4godot/rules.md`.
+    - `AGENTS.md` keeps its content, gains the missing sections, and gets the line that points to `.godot-director/rules.md`.
     - `TASKS.md` and `design/gdd.md` convert to the seed's format, keeping their content.
 - **Upgrade mode:**
-  1. Read the entries in `$C4G/CHANGELOG.md` that are newer than the old version (the install report names it), and carry out their "Upgrade steps".
+  1. Read the entries in `$GDIR/CHANGELOG.md` that are newer than the old version (the install report names it), and carry out their "Upgrade steps". From 2.x that includes 3.0.0, the rename: the report lists what `install.sh` already moved, and the steps cover the game's own files.
   2. Run step 3 only if `bash tools/check.sh` exits 3.
   3. Summarise what changed, using the CHANGELOG and `git diff --stat`.
   4. Go to step 9.
@@ -90,14 +90,14 @@ Then run `bash tools/check.sh` once and keep the result. An existing game often 
 6. **Existing test suites.** Write `tools/check.local.sh` to run them headless. GUT: `"$GODOT_BIN" --headless -s addons/gut/gut_cmdln.gd -gexit`. gdUnit4: its command-line tool, with `--ignoreHeadlessMode`. The check itself skips their test files.
 7. **Typed GDScript.** Add `gdscript/warnings/untyped_declaration=2` under `[debug]` in `project.godot`. If the check then fails with many untyped declarations, set it to `1`, and add an item: "Type the remaining untyped declarations, then set untyped_declaration to 2". To list them later, set it to 2 temporarily.
 
-### Migrate from Claude4Godot 1.x
-Rewrite the old files into the new format (`$C4G/project/` shows the target shape of each, and `.claude4godot/tasks.md` the item format), then delete what's obsolete; git keeps the history. IDs carry over: T and B numbers stay the same, and §11 questions become `Q<n>` with the same number. Also do steps 4–7 of Existing game above, for the screens, the check failures, the test suites and the typing setting.
+### Migrate from Godot Director 1.x
+Rewrite the old files into the new format (`$GDIR/project/` shows the target shape of each, and `.godot-director/tasks.md` the item format), then delete what's obsolete; git keeps the history. IDs carry over: T and B numbers stay the same, and §11 questions become `Q<n>` with the same number. Also do steps 4–7 of Existing game above, for the screens, the check failures, the test suites and the typing setting.
 
 | 1.x | 2.x |
 |---|---|
-| `AGENTS.md` (routing table, ground rules, two agents, model sizing) | Rewrite from `$C4G/project/AGENTS.md`. The rules now live in `.claude4godot/rules.md`. Carry project-specific rules into Project rules. |
+| `AGENTS.md` (routing table, ground rules, two agents, model sizing) | Rewrite from `$GDIR/project/AGENTS.md`. The rules now live in `.godot-director/rules.md`. Carry project-specific rules into Project rules. |
 | `SYSTEMS.md` | AGENTS.md › Architecture (System · Owns · Where · Talks to). Drop file-level detail the code already shows, then delete the file. |
-| `CLAUDE.md` (persona selection) | Replace with `$C4G/project/CLAUDE.md`. |
+| `CLAUDE.md` (persona selection) | Replace with `$GDIR/project/CLAUDE.md`. |
 | `.promptx/` | Delete. |
 | `README.md` › Project Status | TASKS.md › Milestones; leave a one-line link in the README. |
 | `README.md` › AI vs. Human Responsibilities, doc-ownership table | Record what differs from the defaults in Project rules, then delete both sections. |
@@ -108,14 +108,14 @@ Rewrite the old files into the new format (`$C4G/project/` shows the target shap
 | GDD §13 Playtesting Process, and the version line | Delete. The process is in `playtesting/README.md` now. |
 | Version line and revision notes | `design/decisions.md`: one line for each decision you can reconstruct from them and `git log -- design/gdd.md`. Don't invent reasons; write `why: not recorded` when none is known. |
 | `playtesting/FUNCTION_CHECK.md` | Write `playtesting/<today>-function-check.md` as a baseline ("carried over from 1.x"). Items whose last result was OK go in ticked Works; items that were built but never verified go in unticked. Items marked `Broken` with no bug become `B` items. Give the `No task` items to the human as a list: each may become an item. Then delete the file. |
-| `playtesting/README.md` | Take the new version (the `.c4g-new` file). |
+| `playtesting/README.md` | Take the new version (the `.gdir-new` file). |
 | `playtesting/<version>/playtest_N.md` | Leave in place as history. Add `**Processed:** under 1.x` to those already processed; ask if unsure. New reports are `playtesting/YYYY-MM-DD-playtest.md`. |
 | `playtesting/TEMPLATE.md` | Keep its loops and scored statements, worded exactly the same so scores stay comparable, in the new layout. |
-| A `Claude4Godot/` copy inside the game | Delete it after asking. |
-| Files under `.claude/` that aren't in `.claude4godot/manifest` (1.x agents, skills or commands) | List them for the human. Delete the 1.x ones after asking; keep the project's own. |
+| A copy of the framework inside the game (`Claude4Godot/` in 1.x) | Delete it after asking. |
+| Files under `.claude/` that aren't in `.godot-director/manifest` (1.x agents, skills or commands) | List them for the human. Delete the 1.x ones after asking; keep the project's own. |
 | `core.hooksPath` set to `.githooks` | `tools/setup-clone.sh` explains it. The human runs `git config --unset core.hooksPath` (the guard hook blocks you from doing it), then setup-clone installs the hook the 2.x way. |
 
-Finally, search the documents for leftovers and fix them. Use `git grep -n -e … -- '*.md'`, which skips an excluded Claude4Godot folder. Search for `§`, `SYSTEMS.md`, `SETUP.md`, `FUNCTION_CHECK`, `Cowork`, `needs-validation`, `in-progress:`, `persona`, `dev-small`, `.promptx`, `**Version:**`, `--headless --path . --quit` and `{{GODOT_BIN}}`.
+Finally, search the documents for leftovers and fix them. Use `git grep -n -e … -- '*.md'`, which skips an excluded Godot Director folder. Search for `§`, `SYSTEMS.md`, `SETUP.md`, `FUNCTION_CHECK`, `Cowork`, `needs-validation`, `in-progress:`, `persona`, `dev-small`, `.promptx`, `**Version:**`, `--headless --path . --quit` and `{{GODOT_BIN}}`.
 
 ## 6. Project facts and settings
 - **AGENTS.md:** name, pitch, Godot version, dimension, platforms and rendering. Fill in the Layout table from the real folders (delete rows that don't apply), and the Architecture table (from step 5).
@@ -138,18 +138,18 @@ If the loops aren't decided yet, leave the placeholders, and add an agent item "
 
 ## 9. Verify, commit, hand off
 1. Run `bash tools/check.sh` and report the result.
-2. Search for `{{` with `git grep -n "{{" -- '*.md'`. Only postponed template loops may remain, and only if an item exists for them. `git ls-files -o -i --exclude-standard -- '*.c4g-new'` must print nothing.
-3. Walk through the checks in `.claude4godot/procedures/align.md`. Its fixes go into the install commit.
+2. Search for `{{` with `git grep -n "{{" -- '*.md'`. Only postponed template loops may remain, and only if an item exists for them. `git ls-files -o -i --exclude-standard -- '*.gdir-new'` must print nothing.
+3. Walk through the checks in `.godot-director/procedures/align.md`. Its fixes go into the install commit.
 4. List every file created, changed or deleted (`git status`). That includes the `.uid` files Godot 4.4+ creates next to scripts, among them `tools/check.gd.uid`.
 5. **Commit it all in one commit, after the human approves.**
    - Stage everything: `git add -A -- <those files>`.
    - Mark the scripts executable, listing only files that exist (`.claude/hooks` is there with the Claude adapter only): `git add --chmod=+x -- tools/*.sh .githooks/pre-commit`, plus `.claude/hooks/*.sh`.
-   - Use the message `chore: install Claude4Godot <version>` (or `migrate to` / `upgrade to`). The body names the mode and anything you inferred.
+   - Use the message `chore: install Godot Director <version>` (or `migrate to` / `upgrade to`). The body names the mode and anything you inferred.
 6. **The pre-commit hook.**
    - If the check passes, run `bash tools/setup-clone.sh`, which installs it.
    - If the check fails, leave the hook off and add an item: "Install the pre-commit hook once the check passes (`bash tools/setup-clone.sh`)".
    - If setup-clone exits 4, tell the human what it printed (an existing hook or `core.hooksPath` needs a manual line).
-7. **Manual install:** offer to delete the Claude4Godot folder from the game. Deleting it is recommended, since upgrades come from a fresh download or the plugin. If the human keeps it, leave it in `.git/info/exclude`.
+7. **Manual install:** offer to delete the Godot Director folder from the game. Deleting it is recommended, since upgrades come from a fresh download or the plugin. If the human keeps it, leave it in `.git/info/exclude`.
 8. **Offer a "Development" section for the game's README:** clone, then `bash tools/setup-clone.sh`, then the commands.
 9. **Tell the human:**
    - what needs their confirmation;

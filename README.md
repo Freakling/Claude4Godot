@@ -1,4 +1,4 @@
-# Claude4Godot
+# Godot Director
 
 **Make the game you designed, with AI doing the building and you staying the designer.**
 
@@ -8,7 +8,7 @@ A workflow for Godot projects, new or already in development. You decide the des
 
 AI writes game code fast. Without structure, that speed goes wrong in familiar ways:
 
-- **The design drifts.** The AI quietly decides a mechanic or a number you never agreed to. With Claude4Godot, design calls come to you as 2–4 options with a recommendation. Only your choice is written down, and anything undecided goes on an open-questions list instead of being guessed.
+- **The design drifts.** The AI quietly decides a mechanic or a number you never agreed to. With Godot Director, design calls come to you as 2–4 options with a recommendation. Only your choice is written down, and anything undecided goes on an open-questions list instead of being guessed.
 - **"Done" means "it compiled".** One check defines "works": the whole project loads and the tests pass. It runs before every commit that touches code, and in Claude Code also before the AI ends its turn.
 - **Rules end up inside UI screens.** Game rules live in testable classes and screens only display them. The check fails when a screen rolls dice or writes game state.
 - **Context gets lost between sessions.** A few plain files hold everything: the design document, a decision log, the task queue, and an architecture table. Each fact has one home, so any session picks up where the last one stopped.
@@ -25,22 +25,22 @@ Your game needs git (`git init` if it has none) and no uncommitted changes. You 
 npx skills add Freakling/Godot-Director
 ```
 
-That installs the `godot-director` skill for your assistant (Claude Code, Cursor, Codex and many others; you pick in the prompt). Then ask your assistant to set up Claude4Godot, or in Claude Code run `/godot-director`. The skill fetches Claude4Godot outside your game and runs onboarding.
+That installs the `godot-director` skill for your assistant (Claude Code, Cursor, Codex and many others; you pick in the prompt). Then ask your assistant to set up Godot Director, or in Claude Code run `/godot-director`. The skill fetches Godot Director outside your game and runs onboarding.
 
 **Option 2: the Claude Code plugin.** In Claude Code:
 
 ```
 /plugin marketplace add Freakling/Godot-Director
-/plugin install claude4godot@claude4godot
+/plugin install godot-director@godot-director
 ```
 
-Then open a new Claude Code session in your game's folder (or run `/reload-plugins`), and run `/claude4godot:godot-director`.
+Then open a new Claude Code session in your game's folder (or run `/reload-plugins`), and run `/godot-director:godot-director`.
 
-**Option 3: manual install.** Put this repository in your game's root folder, next to `project.godot`, as a folder named `Claude4Godot`. Either run `git clone https://github.com/Freakling/Godot-Director.git Claude4Godot` there, or download the zip and rename the extracted `Godot-Director-main` folder. Then ask your assistant:
+**Option 3: manual install.** Put this repository in your game's root folder, next to `project.godot`, as a folder named `Godot-Director`. Either run `git clone https://github.com/Freakling/Godot-Director.git Godot-Director` there, or download the zip and rename the extracted `Godot-Director-main` folder. Then ask your assistant:
 
-> Read Claude4Godot/ONBOARDING.md and follow it to install Claude4Godot into this project.
+> Read Godot-Director/ONBOARDING.md and follow it to install Godot Director into this project.
 
-Either way, onboarding works out whether this is a new game, an existing game, a Claude4Godot 1.x project to migrate, or an upgrade. It then:
+Either way, onboarding works out whether this is a new game, an existing game, a Godot Director 1.x project to migrate, or an upgrade. It then:
 1. installs the files and finds your Godot;
 2. interviews you (new game) or reads the existing game;
 3. agrees with you who owns what;
@@ -48,14 +48,14 @@ Either way, onboarding works out whether this is a new game, an existing game, a
 
 Afterwards, restart Claude Code so the new commands load. Each new clone of the game later needs one command: `bash tools/setup-clone.sh`.
 
-**With another AI assistant:** tell onboarding, and it installs the tool-neutral core only (`--tools none`); you can also keep the Claude adapter alongside. Your assistant reads `AGENTS.md`, which points it to `.claude4godot/rules.md` and the procedures. The check and the git hook work the same for every tool, and for you.
+**With another AI assistant:** tell onboarding, and it installs the tool-neutral core only (`--tools none`); you can also keep the Claude adapter alongside. Your assistant reads `AGENTS.md`, which points it to `.godot-director/rules.md` and the procedures. The check and the git hook work the same for every tool, and for you.
 
 ### Upgrade
-- **Skill:** ask for the skill again (`/godot-director` in Claude Code); it fetches the latest Claude4Godot each time.
-- **Plugin:** run `/plugin marketplace update claude4godot` and then `/plugin update claude4godot@claude4godot`. Start a new session in the game, and run `/claude4godot:godot-director` again.
-- **Manual:** put the new Claude4Godot folder in the game, and ask for ONBOARDING.md again.
+- **Skill:** ask for the skill again (`/godot-director` in Claude Code); it fetches the latest Godot Director each time.
+- **Plugin:** run `/plugin marketplace update godot-director` and then `/plugin update godot-director@godot-director`. Start a new session in the game, and run `/godot-director:godot-director` again.
+- **Manual:** put the new Godot Director folder in the game, and ask for ONBOARDING.md again.
 
-Only Claude4Godot's own files are replaced, and your edits to them are kept. When a new version also changes a file you edited, the new version is written next to it as `<file>.c4g-new` for you to merge. Review the result with `git diff`.
+Only Godot Director's own files are replaced, and your edits to them are kept. When a new version also changes a file you edited, the new version is written next to it as `<file>.gdir-new` for you to merge. Review the result with `git diff`.
 
 ### Day to day
 
@@ -110,16 +110,16 @@ your-game/
 ├── playtesting/TEMPLATE.md     playtest template, one section per core loop
 ├── tools/check.cfg             check settings: screen folders, folders to skip
 │
-│  Claude4Godot's, tool-neutral: updated on upgrade
-├── .claude4godot/rules.md      the workflow rules, loaded through AGENTS.md
-├── .claude4godot/tasks.md      the TASKS.md item format, read when items are written
-├── .claude4godot/procedures/   next-task · build · design · playtest · function-check · align · prune · review
+│  Godot Director's, tool-neutral: updated on upgrade
+├── .godot-director/rules.md      the workflow rules, loaded through AGENTS.md
+├── .godot-director/tasks.md      the TASKS.md item format, read when items are written
+├── .godot-director/procedures/   next-task · build · design · playtest · function-check · align · prune · review
 ├── tools/check.sh, check.gd    the check;  tools/test_case.gd: base for tests in tests/
 ├── tools/setup-clone.sh        per clone: finds Godot, installs the pre-commit hook
 ├── .githooks/pre-commit        runs the check before commits that touch code, scenes or data
 ├── playtesting/README.md       how playtests and function checks work
 │
-│  Claude4Godot's, Claude Code adapter: updated on upgrade
+│  Godot Director's, Claude Code adapter: updated on upgrade
 ├── .claude/skills/             /next-task and the rest: each points to its procedure
 ├── .claude/agents/             builder (builds each item in a fresh context) · reviewer (read-only)
 ├── .claude/hooks/              runs the check before a turn ends; blocks risky git commands
@@ -128,7 +128,7 @@ your-game/
 Machine-local and gitignored: `tools/godot_bin.local` (the path to your Godot) and `.claude/settings.local.json`.
 
 ### The rules, briefly
-The full rules are in `.claude4godot/rules.md`, and the assistant reads them every session.
+The full rules are in `.godot-director/rules.md`, and the assistant reads them every session.
 - **You decide design.** The assistant offers options and a recommendation. It never picks balance numbers (new values are marked `## PLACEHOLDER`), and never answers an open question itself.
 - **Each fact lives in one place,** and is updated in the same change that makes it untrue.
 - **Rules live in systems, not screens.** They sit in plain classes that tests can build directly. Saves are JSON in `user://`, never Resources, which can run scripts when loaded.
@@ -164,12 +164,12 @@ It exits 0 on pass, 1 on fail, and 3 when it can't run. It remembers the last pa
 | `framework/` | installed into each game: the tool-neutral core, plus `.claude/` for Claude Code |
 | `project/` | seeds for the game's own files, copied only when missing |
 | `skills/godot-director/` | the installer skill, for `npx skills add` and the plugin |
-| `.claude-plugin/` | the Claude Code plugin (`/claude4godot:godot-director`) |
+| `.claude-plugin/` | the Claude Code plugin (`/godot-director:godot-director`) |
 | `examples/market-day/` | a tiny game that uses the workflow: a worked example, and the self-test's fixture |
 | `examples/scenarios.md` | prompts to try after changing the framework, to check that behaviour still holds |
 | `selftest.sh` | tests the installer, the check and the hooks (`bash selftest.sh [path to Godot]`) |
 | `CHANGELOG.md` | what changed, and the upgrade steps for games |
-| `CLAUDE.md` | instructions for an assistant working on Claude4Godot itself |
+| `CLAUDE.md` | instructions for an assistant working on Godot Director itself |
 
 ## License
-MIT © 2026 Vikingur Saemundsson: see [LICENSE](LICENSE). You may use, fork and change Claude4Godot, including in commercial games, as long as the copyright notice and the license stay with it. Installed games carry a copy in `.claude4godot/LICENSE`.
+MIT © 2026 Vikingur Saemundsson: see [LICENSE](LICENSE). You may use, fork and change Godot Director, including in commercial games, as long as the copyright notice and the license stay with it. Installed games carry a copy in `.godot-director/LICENSE`.

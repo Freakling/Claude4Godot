@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude4Godot project check · framework-owned: replaced on upgrade.
+# Godot Director project check · framework-owned: replaced on upgrade.
 #
 # The single definition of "it works":
 #   bash tools/check.sh                 run the check
@@ -23,7 +23,7 @@
 set -u
 cd "$(dirname "$0")/.." || exit 3
 mode="${1:-}"
-state_dir=".godot/claude4godot"
+state_dir=".godot/godot-director"
 limit="${CHECK_TIMEOUT:-600}"
 
 # Hash of every file that can change the result. Empty outside a git repository.
@@ -141,7 +141,8 @@ allow="$state_dir/allow.txt"
 {
   # Engine noise at quick exit. Real leaks show up in the editor too.
   printf '%s\n' "ObjectDB instances leaked at exit" "resources still in use at exit" "Pages in use exist at exit"
-  clean "$state_dir/check.log" | sed -n 's/^C4G-IGNORE://p'
+  # Lines a test prints to expect an error. C4G-IGNORE: is the 2.x spelling, deprecated: remove in 4.0.
+  clean "$state_dir/check.log" | sed -n -e "s/^GDIR-IGNORE://p" -e "s/^C4G-IGNORE://p"
 } | grep -v '^[[:space:]]*$' > "$allow"
 
 # Matching lines, plus the "at:" line under each, minus allowlisted ones.
@@ -156,19 +157,19 @@ scan() { # scan <extended regex> <log files…>
     $0 ~ pattern && !allowed($0) { print; keep = 1 }
   '
 }
-errors="$(scan '^[ \t]*(ERROR|SCRIPT ERROR|USER ERROR|USER SCRIPT ERROR|C4G-FAIL):|Parse Error' "$state_dir/import.log" "$state_dir/check.log")"
+errors="$(scan '^[ \t]*(ERROR|SCRIPT ERROR|USER ERROR|USER SCRIPT ERROR|GDIR-FAIL):|Parse Error' "$state_dir/import.log" "$state_dir/check.log")"
 warnings="$(scan '^[ \t]*(WARNING|SCRIPT WARNING|USER WARNING):' "$state_dir/import.log" "$state_dir/check.log")"
 
-summary="$(clean "$state_dir/check.log" | grep -E '^C4G(-NOTE)?:')"
+summary="$(clean "$state_dir/check.log" | grep -E '^GDIR(-NOTE)?:')"
 if [ -n "$summary" ]; then
-  printf '%s\n' "$summary" | sed 's/^C4G: /check: /; s/^C4G-NOTE: /check: note: /'
+  printf '%s\n' "$summary" | sed 's/^GDIR: /check: /; s/^GDIR-NOTE: /check: note: /'
 else
   echo "check: tools/check.gd didn't finish (see $state_dir/check.log)"
   failed=1
 fi
 hooks_dir="$(git rev-parse --git-path hooks 2>/dev/null)"
-if [ -n "$hooks_dir" ] && ! grep -qs "Claude4Godot" "$hooks_dir/pre-commit"; then
-  echo "check: note: this clone has no Claude4Godot pre-commit hook. Run: bash tools/setup-clone.sh"
+if [ -n "$hooks_dir" ] && ! grep -qs "Godot Director" "$hooks_dir/pre-commit"; then
+  echo "check: note: this clone has no Godot Director pre-commit hook. Run: bash tools/setup-clone.sh"
 fi
 
 if [ -n "$warnings" ]; then

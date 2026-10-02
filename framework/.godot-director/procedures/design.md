@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Design session
 
 Brainstorm a topic, rank and answer open design questions, or change how part of the game works. Write down only what the human decides. Your job is to make the human's decisions fast and well informed, never to make them.
@@ -22,7 +22,7 @@ Brainstorm a topic, rank and answer open design questions, or change how part of
 1. **GDD:** write the rule into its section as the current design, replacing any text it supersedes. A new area gets a new subsection.
 2. **`design/decisions.md`:** append one line in the format given at the top of that file.
 3. **GDD › Open Questions:** delete the answered question. Follow-up questions become new `Q<n>` (bump `Next`).
-4. **TASKS.md:** add or change the items the decision creates, in the format in `.claude4godot/tasks.md`. Plan a big rework in stages: first move rules out of screens, then rework the systems, then rebuild the UI.
+4. **TASKS.md:** add or change the items the decision creates, in the format in `.godot-director/tasks.md`. Plan a big rework in stages: first move rules out of screens, then rework the systems, then rebuild the UI.
    - Give each new item a Size, `Depends on`, `Touches`, `Done when` with tags, and a `GDD:` heading.
    - A `done` item the decision changes gets a new item; don't reopen it.
    - Leave `in-progress` items alone and tell the human about them, since another session may be working on them.

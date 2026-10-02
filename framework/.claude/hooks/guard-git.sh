@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
-# Claude4Godot git guard · Claude Code PreToolUse hook on Bash · framework-owned: replaced on upgrade.
+# Godot Director git guard · Claude Code PreToolUse hook on Bash · framework-owned: replaced on upgrade.
 #
 # Permission rules match how a command starts, so `git commit -m x --no-verify` or
 # `git push origin main --force` would slip past them. This hook looks at the whole command and
-# blocks what .claude4godot/rules.md › Git reserves for the human. It pattern-matches the text,
+# blocks what .godot-director/rules.md › Git reserves for the human. It pattern-matches the text,
 # so it's a strong safety net, not a guarantee. It starts no other processes (it runs on every
 # Bash call).
 
@@ -21,7 +21,7 @@ sq="'[^']*'"
 while [[ $code =~ $sq ]]; do code="${code/"${BASH_REMATCH[0]}"/ Q }"; done
 
 block() {
-  echo "Claude4Godot: blocked: $1. If it's really needed, ask the human to run it." >&2
+  echo "Godot Director: blocked: $1. If it's really needed, ask the human to run it." >&2
   exit 2
 }
 seg='[^;&|]*'   # stays within one command of a compound command line

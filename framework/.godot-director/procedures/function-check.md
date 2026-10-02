@@ -1,4 +1,4 @@
-<!-- Claude4Godot · framework-owned: replaced on upgrade. -->
+<!-- Godot Director · framework-owned: replaced on upgrade. -->
 # Function check
 
 Prepare or process a function check: a human verifies, item by item, that built rules work as written. A playtest asks how the game feels; a function check asks whether each rule works. `(test)` outcomes are proven by tests and `(check)` outcomes by commands the agent ran, so a function check covers the rest: `(play)` outcomes, and bug fixes that have no regression test.
@@ -9,7 +9,7 @@ The request is `prepare` (the default), `process`, or `all` (a full regression r
 1. Run `bash tools/check.sh`. If it fails, say so and stop: the build isn't worth checking by hand.
 2. Collect the `(play)` outcomes of `done` items in TASKS.md and TASKS-archive.md.
 3. Keep those that haven't been ticked (Works or Broken) in an earlier `playtesting/*-function-check.md`. Add done bugs without a regression test whose fix hasn't been ticked yet, with the outcome "the repro no longer happens".
-4. **`all`:** keep every `(play)` outcome, plus one item for each GDD rule that no done item covers. That second part picks up features the game had before Claude4Godot.
+4. **`all`:** keep every `(play)` outcome, plus one item for each GDD rule that no done item covers. That second part picks up features the game had before Godot Director.
 5. Write `playtesting/YYYY-MM-DD-function-check.md`:
    ```
    # Function check YYYY-MM-DD

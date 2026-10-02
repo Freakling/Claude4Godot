@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Claude4Godot self-test. It installs the framework into temporary copies of examples/market-day
+# Godot Director self-test. It installs the framework into temporary copies of examples/market-day
 # and tests the installer, the project check, the per-clone setup, the Claude Code hooks and the
 # pre-commit hook. Run it after every change to the framework.
 #
@@ -14,6 +14,8 @@ work="$(mktemp -d)"
 if [ "${KEEP:-0}" = "1" ]; then echo "keeping $work"; else trap 'rm -rf "$work"' EXIT; fi
 
 passed=0; failed=0
+nl='
+'
 ok()  { passed=$((passed + 1)); echo "  ok    $1"; }
 bad() { failed=$((failed + 1)); echo "  FAIL  $1"; [ -n "${2:-}" ] && printf '%s\n' "$2" | tail -n 15 | sed 's/^/          /'; }
 expect_status() { # <what> <expected> <actual> [output]
@@ -43,48 +45,56 @@ plugin_version="$(sed -n 's/.*"version"[[:space:]]*:[[:space:]]*"\([^"]*\)".*/\1
   || bad "plugin.json version ($plugin_version) matches VERSION ($(cat "$src/VERSION"))"
 installer="$src/skills/godot-director/SKILL.md"
 if [ -f "$installer" ] && grep -q '^name: godot-director$' "$installer" && grep -q '^description: ' "$installer"     && grep -q 'ONBOARDING.md' "$installer" && grep -q 'git clone' "$installer"     && [ "$(find "$src" -name SKILL.md -not -path "*/.git/*" -mindepth 2 -maxdepth 4 | wc -l)" -eq 1 ]; then
-  ok "the installer skill is the only one the skills CLI finds, and fetches Claude4Godot on its own"
+  ok "the installer skill is the only one the skills CLI finds, and fetches Godot Director on its own"
 else
   bad "skills/godot-director/SKILL.md (name, description, self-contained fetch, only skill found by npx skills add)"
 fi
-cmp -s "$src/LICENSE" "$src/framework/.claude4godot/LICENSE" && ok "the installed LICENSE copy matches LICENSE" \
-  || bad "framework/.claude4godot/LICENSE differs from LICENSE"
+cmp -s "$src/LICENSE" "$src/framework/.godot-director/LICENSE" && ok "the installed LICENSE copy matches LICENSE" \
+  || bad "framework/.godot-director/LICENSE differs from LICENSE"
 missing=""
 for skill in "$src"/framework/.claude/skills/*/SKILL.md; do
   name="$(basename "$(dirname "$skill")")"
-  [ -f "$src/framework/.claude4godot/procedures/$name.md" ] || missing="$missing $name"
+  [ -f "$src/framework/.godot-director/procedures/$name.md" ] || missing="$missing $name"
   grep -q "^name: $name$" "$skill" || missing="$missing $name(name)"
 done
 [ -z "$missing" ] && ok "every skill points to an existing procedure" || bad "skills without procedures:$missing"
 missing=""
-for doc in "$src"/framework/.claude4godot/rules.md "$src"/framework/.claude4godot/procedures/*.md "$src"/project/TASKS.md; do
+for doc in "$src"/framework/.godot-director/rules.md "$src"/framework/.godot-director/procedures/*.md "$src"/project/TASKS.md; do
   for ref in $(grep -o '[a-z-]*\.md' "$doc" | sort -u); do
     case "$ref" in
-      rules.md|tasks.md) [ -f "$src/framework/.claude4godot/$ref" ] || missing="$missing $(basename "$doc")→$ref" ;;
+      rules.md|tasks.md) [ -f "$src/framework/.godot-director/$ref" ] || missing="$missing $(basename "$doc")→$ref" ;;
       next-task.md|build.md|design.md|playtest.md|function-check.md|align.md|prune.md|review.md)
-        [ -f "$src/framework/.claude4godot/procedures/$ref" ] || missing="$missing $(basename "$doc")→$ref" ;;
+        [ -f "$src/framework/.godot-director/procedures/$ref" ] || missing="$missing $(basename "$doc")→$ref" ;;
     esac
   done
 done
 [ -z "$missing" ] && ok "rules and procedures only point to files that exist" || bad "dangling references:$missing"
 missing=""
 for agent in "$src"/framework/.claude/agents/*.md; do
-  procedure="$(grep -o '\.claude4godot/procedures/[a-z-]*\.md' "$agent" | head -n 1)"
+  procedure="$(grep -o '\.godot-director/procedures/[a-z-]*\.md' "$agent" | head -n 1)"
   procedure="${procedure##*/}"
-  [ -n "$procedure" ] && [ -f "$src/framework/.claude4godot/procedures/$procedure" ] || missing="$missing $(basename "$agent")"
+  [ -n "$procedure" ] && [ -f "$src/framework/.godot-director/procedures/$procedure" ] || missing="$missing $(basename "$agent")"
 done
 [ -z "$missing" ] && ok "every subagent points to an existing procedure" || bad "subagents without procedures:$missing"
+# The old name (Claude4Godot, 2.x and earlier) is left only in history and in the 2.x migration.
+allowed=" CHANGELOG.md install.sh selftest.sh ONBOARDING.md framework/tools/check.gd framework/tools/check.sh framework/tools/setup-clone.sh "
+leftovers=""
+for file in $(cd "$src" && grep -rIli --exclude-dir=.git --exclude-dir=.godot -e claude4godot -e c4g . | sed 's|^\./||'); do
+  case "$allowed" in *" $file "*) ;; *) leftovers="$leftovers $file" ;; esac
+done
+[ -z "$leftovers" ] && ok "the old name is left only in the changelog and the 2.x migration" \
+  || bad "the old name (claude4godot, c4g) is still in:$leftovers"
 
 # --- installer ----------------------------------------------------------------------------------
 echo "installer"
 game="$work/market-day"
 cp -R "$src/examples/market-day" "$game"
-rm -rf "$game/.godot" "$game/.claude" "$game/.claude4godot" "$game/.githooks" "$game/tools/godot_bin.local"
+rm -rf "$game/.godot" "$game/.claude" "$game/.godot-director" "$game/.githooks" "$game/tools/godot_bin.local"
 (cd "$game" && git init -q && git config core.autocrlf false && git add -A && git_q commit -qm "example") || exit 1
 cd "$game" || exit 1
 
 out="$(bash "$src/install.sh" . 2>&1)"; expect_status "installs" 0 $? "$out"
-if [ -f .claude4godot/manifest ] && [ -f .claude4godot/procedures/next-task.md ] && [ -f tools/check.gd ] \
+if [ -f .godot-director/manifest ] && [ -f .godot-director/procedures/next-task.md ] && [ -f tools/check.gd ] \
     && [ -f tools/setup-clone.sh ] && [ -f .claude/skills/next-task/SKILL.md ] && [ -f .claude/hooks/guard-git.sh ]; then
   ok "copies the core and the Claude adapter, and writes the manifest"
 else
@@ -94,52 +104,106 @@ grep -q "Market Day" AGENTS.md && ok "keeps the project's own files" || bad "kee
 [ -z "$(git status --porcelain)" ] && ok "adds no duplicate .gitignore/.gitattributes lines" || bad "adds no duplicate lines" "$(git status --porcelain)"
 out="$(bash "$src/install.sh" . 2>&1)"; expect_output "a second run changes nothing" "0 new, 0 updated" "$out"
 
-echo "# my own note" >> .claude4godot/procedures/prune.md
+echo "# my own note" >> .godot-director/procedures/prune.md
 out="$(bash "$src/install.sh" . 2>&1)"
-if grep -q "my own note" .claude4godot/procedures/prune.md && [ ! -f .claude4godot/procedures/prune.md.c4g-new ]; then
+if grep -q "my own note" .godot-director/procedures/prune.md && [ ! -f .godot-director/procedures/prune.md.gdir-new ]; then
   ok "keeps a local edit when this version doesn't change the file"
 else
   bad "keeps a local edit when this version doesn't change the file" "$out"
 fi
 # Pretend the installed version had a different prune.md: now both sides changed.
-awk -F'\t' -v OFS='\t' '$2 == ".claude4godot/procedures/prune.md" { $1 = "0000000000000000000000000000000000000000" } { print }' \
-  .claude4godot/manifest > "$work/manifest" && cp "$work/manifest" .claude4godot/manifest
+awk -F'\t' -v OFS='\t' '$2 == ".godot-director/procedures/prune.md" { $1 = "0000000000000000000000000000000000000000" } { print }' \
+  .godot-director/manifest > "$work/manifest" && cp "$work/manifest" .godot-director/manifest
 out="$(bash "$src/install.sh" . 2>&1)"
-if [ -f .claude4godot/procedures/prune.md.c4g-new ] && grep -q "my own note" .claude4godot/procedures/prune.md; then
-  ok "writes .c4g-new when both sides changed a file"
+if [ -f .godot-director/procedures/prune.md.gdir-new ] && grep -q "my own note" .godot-director/procedures/prune.md; then
+  ok "writes .gdir-new when both sides changed a file"
 else
-  bad "writes .c4g-new when both sides changed a file" "$out"
+  bad "writes .gdir-new when both sides changed a file" "$out"
 fi
-mv .claude4godot/procedures/prune.md.c4g-new .claude4godot/procedures/prune.md
+mv .godot-director/procedures/prune.md.gdir-new .godot-director/procedures/prune.md
 # An unchanged file from an older version is replaced.
-printf 'old version\n' > .claude4godot/procedures/align.md
-awk -F'\t' -v OFS='\t' -v h="$(hash_of .claude4godot/procedures/align.md)" '$2 == ".claude4godot/procedures/align.md" { $1 = h } { print }' \
-  .claude4godot/manifest > "$work/manifest" && cp "$work/manifest" .claude4godot/manifest
+printf 'old version\n' > .godot-director/procedures/align.md
+awk -F'\t' -v OFS='\t' -v h="$(hash_of .godot-director/procedures/align.md)" '$2 == ".godot-director/procedures/align.md" { $1 = h } { print }' \
+  .godot-director/manifest > "$work/manifest" && cp "$work/manifest" .godot-director/manifest
 out="$(bash "$src/install.sh" . 2>&1)"
-cmp -s .claude4godot/procedures/align.md "$src/framework/.claude4godot/procedures/align.md" \
+cmp -s .godot-director/procedures/align.md "$src/framework/.godot-director/procedures/align.md" \
   && ok "replaces a file unchanged since the last install" || bad "replaces a file unchanged since the last install" "$out"
 
 printf 'extends RefCounted\n' > tools/retired.gd; printf 'uid://x\n' > tools/retired.gd.uid
-printf '%s\ttools/retired.gd\n' "$(hash_of tools/retired.gd)" >> .claude4godot/manifest
+printf '%s\ttools/retired.gd\n' "$(hash_of tools/retired.gd)" >> .godot-director/manifest
 out="$(bash "$src/install.sh" . 2>&1)"
 [ ! -f tools/retired.gd ] && [ ! -f tools/retired.gd.uid ] && ok "removes a dropped file and its .uid" || bad "removes a dropped file and its .uid" "$out"
 
+# Upgrading a 2.x install, made by turning a fresh install back into the 2.x layout.
+legacy="$work/legacy"; new_repo "$legacy"
+bash "$src/install.sh" "$legacy" >/dev/null 2>&1
+(
+  cd "$legacy" || exit 1
+  git_q add -A && git_q commit -qm "install" && git mv .godot-director .claude4godot || exit 1
+  printf 'old rules\n' > .claude4godot/rules.md                       # unchanged since the 2.x install
+  echo "# my own note" >> .claude4godot/procedures/prune.md          # edited; 3.0.0 doesn't change it
+  echo "# my own note" >> .claude4godot/procedures/align.md          # edited; 2.x had another version
+  awk -F'\t' -v OFS='\t' -v rules="$(hash_of .claude4godot/rules.md)" '
+    /^# godot-director / { print "# claude4godot 2.0.2"; next }
+    $2 == ".godot-director/rules.md" { $1 = rules }
+    $2 == ".godot-director/procedures/align.md" { $1 = "0000000000000000000000000000000000000000" }
+    { sub(/^\.godot-director\//, ".claude4godot/", $2); print }' .claude4godot/manifest > "$work/manifest"
+  cp "$work/manifest" .claude4godot/manifest
+  for file in .gitignore .gitattributes; do
+    sed -e 's|^# Godot Director$|# Claude4Godot|' -e 's|\.gdir-new|.c4g-new|' -e 's|/\.godot-director/|/.claude4godot/|' "$file" > "$work/lines"
+    cp "$work/lines" "$file"
+  done
+  printf 'x\n' > tools/check.sh.c4g-new
+  printf '#!/usr/bin/env bash\n# Claude4Godot: runs the project'"'"'s committed pre-commit hook. Installed by tools/setup-clone.sh.\nexit 0\n' \
+    > "$(git rev-parse --git-path hooks)/pre-commit"
+  mkdir -p .godot/claude4godot && : > .godot/claude4godot/check.log
+  git_q add -A && git_q commit -qm "2.x layout"
+)
+out="$(bash "$src/install.sh" "$legacy" 2>&1)"; expect_status "upgrades a 2.x install" 0 $? "$out"
+expect_output "reports the upgrade from 2.x and the migration" "upgraded from 2\.0\.2 to .*migrated from the 2\.x names" "$(printf '%s' "$out" | tr '\n' ' ')"
+cd "$legacy" || exit 1
+if [ ! -e .claude4godot ] && [ -f .godot-director/manifest ] && grep -q "^# godot-director $(tr -d '\r\n' < "$src/VERSION")$" .godot-director/manifest \
+    && ! grep -q claude4godot .godot-director/manifest && [ -n "$(git diff --cached --name-status -M | grep '^R.*\.claude4godot/LICENSE')" ]; then
+  ok "moves .claude4godot/ to .godot-director/ with git mv, and rewrites the manifest"
+else
+  bad "moves .claude4godot/ to .godot-director/ with git mv, and rewrites the manifest" "$out$nl$(git status --short)"
+fi
+if grep -q "my own note" .godot-director/procedures/prune.md && [ ! -f .godot-director/procedures/prune.md.gdir-new ] \
+    && grep -q "my own note" .godot-director/procedures/align.md && [ -f .godot-director/procedures/align.md.gdir-new ] \
+    && cmp -s .godot-director/rules.md "$src/framework/.godot-director/rules.md"; then
+  ok "carries the 2.x manifest over: local edits kept or flagged, unchanged files replaced"
+else
+  bad "carries the 2.x manifest over: local edits kept or flagged, unchanged files replaced" "$out"
+fi
+[ -f tools/check.sh.gdir-new ] && [ ! -f tools/check.sh.c4g-new ] && ok "renames a leftover .c4g-new to .gdir-new" \
+  || bad "renames a leftover .c4g-new to .gdir-new" "$out"
+if ! grep -qi "claude4godot\|c4g" .gitignore .gitattributes && [ "$(grep -c '^\*\.gdir-new$' .gitignore)" -eq 1 ] \
+    && [ "$(grep -c '^/\.godot-director/\*\* text eol=lf$' .gitattributes)" -eq 1 ]; then
+  ok "replaces the 2.x .gitignore and .gitattributes lines without duplicates"
+else
+  bad "replaces the 2.x .gitignore and .gitattributes lines without duplicates" "$(cat .gitignore .gitattributes)"
+fi
+grep -q "^# Godot Director: runs" "$(git rev-parse --git-path hooks)/pre-commit" && [ ! -e .godot/claude4godot ] \
+  && ok "updates the clone's 2.x pre-commit shim and drops the old runtime folder" \
+  || bad "updates the clone's 2.x pre-commit shim and drops the old runtime folder" "$out"
+cd "$game" || exit 1
+
 core_only="$work/core-only"; new_repo "$core_only"
 out="$(bash "$src/install.sh" --tools none "$core_only" 2>&1)"
-if [ ! -e "$core_only/.claude" ] && [ ! -e "$core_only/CLAUDE.md" ] && [ -f "$core_only/AGENTS.md" ] && [ -f "$core_only/.claude4godot/rules.md" ]; then
+if [ ! -e "$core_only/.claude" ] && [ ! -e "$core_only/CLAUDE.md" ] && [ -f "$core_only/AGENTS.md" ] && [ -f "$core_only/.godot-director/rules.md" ]; then
   ok "--tools none installs the tool-neutral core only"
 else
   bad "--tools none installs the tool-neutral core only" "$out"
 fi
-# Installing from a Claude4Godot folder that is itself a git clone, or sits inside the game.
-c4g_clone="$work/c4g-clone"; cp -R "$src" "$c4g_clone"; rm -rf "$c4g_clone/.git"
-(cd "$c4g_clone" && git init -q && git config core.autocrlf false && git add -A && git_q commit -qm c4g) >/dev/null 2>&1
+# Installing from a Godot Director folder that is itself a git clone, or sits inside the game.
+gdir_clone="$work/gdir-clone"; cp -R "$src" "$gdir_clone"; rm -rf "$gdir_clone/.git"
+(cd "$gdir_clone" && git init -q && git config core.autocrlf false && git add -A && git_q commit -qm gdir) >/dev/null 2>&1
 from_clone="$work/from-clone"; new_repo "$from_clone"
-out="$(bash "$c4g_clone/install.sh" "$from_clone" 2>&1)"; expect_status "installs from a Claude4Godot git clone" 0 $? "$out"
-inside="$work/inside"; new_repo "$inside"; cp -R "$c4g_clone" "$inside/Claude4Godot"; rm -rf "$inside/Claude4Godot/.git"
-printf '/Claude4Godot/\n' >> "$inside/.git/info/exclude"
-out="$(bash "$inside/Claude4Godot/install.sh" "$inside" 2>&1)"; expect_status "installs from a Claude4Godot folder inside the game" 0 $? "$out"
-[ -f "$inside/.claude4godot/LICENSE" ] && ok "installs the license copy" || bad "installs the license copy" "$out"
+out="$(bash "$gdir_clone/install.sh" "$from_clone" 2>&1)"; expect_status "installs from a Godot Director git clone" 0 $? "$out"
+inside="$work/inside"; new_repo "$inside"; cp -R "$gdir_clone" "$inside/Godot-Director"; rm -rf "$inside/Godot-Director/.git"
+printf '/Godot-Director/\n' >> "$inside/.git/info/exclude"
+out="$(bash "$inside/Godot-Director/install.sh" "$inside" 2>&1)"; expect_status "installs from a Godot Director folder inside the game" 0 $? "$out"
+[ -f "$inside/.godot-director/LICENSE" ] && ok "installs the license copy" || bad "installs the license copy" "$out"
 mkdir -p "$core_only/sub"
 out="$(bash "$src/install.sh" "$core_only/sub" 2>&1)"; expect_status "refuses a folder that isn't the repository root" 1 $? "$out"
 
@@ -147,8 +211,8 @@ out="$(bash "$src/install.sh" "$core_only/sub" 2>&1)"; expect_status "refuses a 
 crlf_src="$work/crlf-src"; new_repo "$crlf_src"
 bash "$src/install.sh" "$crlf_src" >/dev/null 2>&1 && (cd "$crlf_src" && git add -A && git_q commit -qm install)
 git -c core.autocrlf=true clone -q "$crlf_src" "$work/crlf" && cd "$work/crlf" && git config core.autocrlf true
-[ -f .claude4godot/rules.md ] && ok "a clone carries the installed framework" || bad "a clone carries the installed framework"
-awk '{ printf "%s\r\n", $0 }' .claude4godot/rules.md > "$work/crlf-rules" && cp "$work/crlf-rules" .claude4godot/rules.md
+[ -f .godot-director/rules.md ] && ok "a clone carries the installed framework" || bad "a clone carries the installed framework"
+awk '{ printf "%s\r\n", $0 }' .godot-director/rules.md > "$work/crlf-rules" && cp "$work/crlf-rules" .godot-director/rules.md
 out="$(bash "$src/install.sh" . 2>&1)"; status=$?
 expect_status "reinstalls in a CRLF clone" 0 "$status" "$out"
 expect_output "reports that clone as reinstalled" "reinstalled" "$out"
@@ -189,7 +253,7 @@ fi
 echo "setup-clone"
 out="$(GODOT_BIN=/nonexistent/godot bash tools/check.sh 2>&1)"; expect_status "the check exits 3 without Godot" 3 $? "$out"
 out="$(bash tools/setup-clone.sh "$godot" 2>&1)"; expect_status "setup-clone succeeds" 0 $? "$out"
-grep -qs "Claude4Godot" "$(git rev-parse --git-path hooks)/pre-commit" && ok "installs the pre-commit hook" || bad "installs the pre-commit hook" "$out"
+grep -qs "Godot Director" "$(git rev-parse --git-path hooks)/pre-commit" && ok "installs the pre-commit hook" || bad "installs the pre-commit hook" "$out"
 [ -z "$(git config --get core.hooksPath)" ] && ok "leaves core.hooksPath alone (Git LFS keeps working)" || bad "leaves core.hooksPath alone"
 # A path saved by PowerShell: UTF-8 BOM, trailing spaces, CRLF.
 printf '\357\273\277%s  \r\n' "$godot" > tools/godot_bin.local
@@ -200,7 +264,7 @@ out="$(bash tools/check.sh 2>&1)"; status=$?
 expect_status "passes on a fresh clone of the example (Godot path with BOM and spaces)" 0 "$status" "$out"
 expect_output "runs the example's tests" "6 tests passed" "$out"
 expect_output "scans the screen scripts" "1 screen script scanned" "$out"
-expect_no_output "reports no missing hook" "no Claude4Godot pre-commit hook" "$out"
+expect_no_output "reports no missing hook" "no Godot Director pre-commit hook" "$out"
 out="$(bash tools/check.sh --if-changed 2>&1)"; expect_output "--if-changed reuses the last pass" "nothing changed since the last passing run" "$out"
 
 fault() { # fault <what> <file> <text to append> <regex the output must contain>
@@ -244,6 +308,14 @@ printf '\nvar _phase: RunState.Phase = RunState.Phase.OPEN\n' >> scripts/ui/shop
 out="$(bash tools/check.sh 2>&1)"; expect_status "doesn't mistake a type annotation for a write to an autoload" 0 $? "$out"
 cp "$work/saved-state" scripts/autoload/run_state.gd; cp "$work/saved-screen" scripts/ui/shop_screen.gd
 
+# Autoloads guard player data with the check's meta, and tests mark the errors they expect; the
+# 2.x names stay accepted until 4.0.
+printf 'extends "res://tools/test_case.gd"\n\nfunc test_check_meta() -> void:\n\texpect(Engine.has_meta("godot_director_check"))\n\texpect(Engine.has_meta("claude4godot_check"))\n\nfunc test_ignore_markers() -> void:\n\tprint("GDIR-IGNORE:selftest expected error one")\n\tpush_error("selftest expected error one")\n\tprint("C4G-IGNORE:selftest expected error two")\n\tpush_error("selftest expected error two")\n' > tests/test_selftest_meta.gd
+out="$(bash tools/check.sh 2>&1)"; status=$?
+expect_status "accepts expected errors marked GDIR-IGNORE, or C4G-IGNORE as in 2.x" 0 "$status" "$out"
+expect_output "sets the check meta under the new and the deprecated 2.x name" "8 tests passed" "$out"
+rm -f tests/test_selftest_meta.gd tests/test_selftest_meta.gd.uid
+
 out="$(bash tools/check.sh 2>&1)"; expect_status "passes again after the faults are removed" 0 $? "$out"
 
 # --- Stop hook ----------------------------------------------------------------------------------
@@ -263,10 +335,10 @@ out="$(hook)"; expect_status "reports the same failing state only once" 0 $? "$o
 out="$(bash tools/check.sh --if-changed 2>&1)"; status=$?
 expect_status "--if-changed repeats a failure without rerunning" 1 "$status" "$out"
 expect_output "says the failing state is unchanged" "nothing changed since the last failing run" "$out"
-rm -f .godot/claude4godot/last-reported
-: > .godot/claude4godot/building
+rm -f .godot/godot-director/last-reported
+: > .godot/godot-director/building
 out="$(hook)"; expect_status "leaves a builder's half-built files alone" 0 $? "$out"
-rm -f .godot/claude4godot/building
+rm -f .godot/godot-director/building
 out="$(hook)"; expect_status "blocks again once the builder is done" 2 $? "$out"
 cp "$work/passing" scripts/systems/market.gd
 out="$(hook)"; expect_status "lets the fixed state through" 0 $? "$out"
@@ -290,10 +362,10 @@ cp scenes/shop_screen.tscn "scenes/þorp.tscn" && git add "scenes/þorp.tscn"
 out="$(git_q commit -qm "non-ASCII scene" 2>&1)"; status=$?
 expect_output "runs the check for a non-ASCII file name" "running the project check" "$out"
 expect_status "commits it" 0 "$status" "$out"
-printf 'x\n' > tools/check.sh.c4g-new
+printf 'x\n' > tools/check.sh.gdir-new
 printf '\n# another change\n' >> scripts/systems/market.gd && git add scripts/systems/market.gd
-out="$(git_q commit -qm "with c4g-new" 2>&1)"; expect_status "refuses while a .c4g-new file is unmerged" 1 $? "$out"
-rm -f tools/check.sh.c4g-new
+out="$(git_q commit -qm "with gdir-new" 2>&1)"; expect_status "refuses while a .gdir-new file is unmerged" 1 $? "$out"
+rm -f tools/check.sh.gdir-new
 no_project="$work/no-project"; new_repo "$no_project"
 bash "$src/install.sh" "$no_project" >/dev/null 2>&1
 (cd "$no_project" && printf '%s\n' "$godot" > tools/godot_bin.local && bash tools/setup-clone.sh >/dev/null 2>&1 \

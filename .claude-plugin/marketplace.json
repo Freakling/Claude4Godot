@@ -1,12 +1,12 @@
 {
-  "name": "claude4godot",
-  "description": "The Claude4Godot workflow for Godot games.",
+  "name": "godot-director",
+  "description": "The Godot Director workflow for Godot games.",
   "owner": { "name": "Freakling" },
   "plugins": [
     {
-      "name": "claude4godot",
+      "name": "godot-director",
       "source": "./",
-      "description": "Installs and upgrades the Claude4Godot workflow in a Godot project."
+      "description": "Installs and upgrades the Godot Director workflow in a Godot project."
     }
   ]
 }

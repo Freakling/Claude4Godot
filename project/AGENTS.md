@@ -2,7 +2,7 @@
 
 {{ONE_PARAGRAPH_PITCH}}
 
-Instructions for AI assistants working on this game. The workflow is Claude4Godot: its rules are in `.claude4godot/rules.md`, which names the procedure for each kind of request. Read it before any work, unless your tool has already loaded it (Claude Code imports it: @.claude4godot/rules.md).
+Instructions for AI assistants working on this game. The workflow is Godot Director: its rules are in `.godot-director/rules.md`, which names the procedure for each kind of request. Read it before any work, unless your tool has already loaded it (Claude Code imports it: @.godot-director/rules.md).
 
 ## Project facts
 - Godot {{GODOT_VERSION}} · GDScript · {{DIMENSION}} · {{PLATFORMS}}
@@ -28,7 +28,7 @@ One row per system: what it owns and where its boundary is. Screens depend on sy
 <!-- | `RunState` (autoload) | the current run: day, gold, roster | `scripts/autoload/run_state.gd` | calls `Market`; emits `changed` for screens | -->
 
 ## Project rules
-<!-- Only where this project differs from the Claude4Godot defaults, as agreed with the human.
+<!-- Only where this project differs from the Godot Director defaults, as agreed with the human.
 Examples:
 - The agent may generate UI icons; all other art and audio stays human-made.
 - No git remote: never push.
