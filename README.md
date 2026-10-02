@@ -2,7 +2,9 @@
 
 **Make the game you designed, with AI doing the building and you staying the designer.**
 
-[![Support Godot Director on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Godot%20Director-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/freakling)
+If you use Godot Director, please consider supporting me on Ko-fi.
+
+<a href='https://ko-fi.com/Q6J027VJG1' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Support me on Ko-fi' /></a>
 
 A workflow for Godot projects, new or already in development. You decide the design, the balance and the priorities. The AI builds, tests and keeps the records. Built for Claude Code, and usable with any AI coding assistant that reads `AGENTS.md`. Everything lives in your game's own git repository.
 
@@ -17,7 +19,9 @@ AI writes game code fast. Without structure, that speed goes wrong in familiar w
 
 ## How to use it
 
-> You've read this far, so Godot Director may be what you're looking for. It's free and open source. If it helps you make your game, you can support its development on [Ko-fi](https://ko-fi.com/freakling).
+> You've read this far, so Godot Director may be what you're looking for. It's free and open source, and if it helps you make your game, a tip on Ko-fi helps me keep building it. I greatly appreciate your support.
+>
+> <a href='https://ko-fi.com/Q6J027VJG1' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Support me on Ko-fi' /></a>
 
 ### Install
 
