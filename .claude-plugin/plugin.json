@@ -14,5 +14,9 @@
     "workflow",
     "gdscript"
   ],
-  "homepage": "https://github.com/Freakling/Godot-Director"
+  "homepage": "https://github.com/Freakling/Godot-Director",
+  "documentationUrl": "https://github.com/Freakling/Godot-Director#readme",
+  "supportUrl": "https://github.com/Freakling/Godot-Director/issues",
+  "privacyPolicyUrl": "https://github.com/Freakling/Godot-Director/blob/main/PRIVACY.md",
+  "termsOfServiceUrl": "https://github.com/Freakling/Godot-Director/blob/main/LICENSE"
 }
