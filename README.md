@@ -15,9 +15,9 @@ AI writes game code fast. Without structure, that speed goes wrong in familiar w
 
 ## How to use it
 
-> You've read this far, so Godot Director may be what you're looking for. It's free and open source, and if it helps you make your game, a tip on Ko-fi helps me keep building it. I greatly appreciate your support.
+> You've read this far, so Godot Director may be what you're looking for. It's free and open source, and if it helps you make your game, a tip on Ko-fi or GitHub Sponsors helps me keep building it. I greatly appreciate your support.
 >
-> <a href='https://ko-fi.com/Q6J027VJG1' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Support me on Ko-fi' /></a>
+> <a href='https://ko-fi.com/Q6J027VJG1' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://storage.ko-fi.com/cdn/kofi5.png?v=6' border='0' alt='Support me on Ko-fi' /></a> <a href='https://github.com/sponsors/Freakling' target='_blank'><img height='36' style='border:0px;height:36px;' src='https://img.shields.io/badge/Sponsor-on%20GitHub-EA4AAA?logo=githubsponsors&logoColor=white&style=for-the-badge' border='0' alt='Sponsor me on GitHub' /></a>
 
 ### Install
 
