@@ -2,6 +2,8 @@
 
 **Make the game you designed, with AI doing the building and you staying the designer.**
 
+[![Support Godot Director on Ko-fi](https://img.shields.io/badge/Ko--fi-Support%20Godot%20Director-FF5E5B?logo=ko-fi&logoColor=white)](https://ko-fi.com/freakling)
+
 A workflow for Godot projects, new or already in development. You decide the design, the balance and the priorities. The AI builds, tests and keeps the records. Built for Claude Code, and usable with any AI coding assistant that reads `AGENTS.md`. Everything lives in your game's own git repository.
 
 ## Why
@@ -14,6 +16,8 @@ AI writes game code fast. Without structure, that speed goes wrong in familiar w
 - **Context gets lost between sessions.** A few plain files hold everything: the design document, a decision log, the task queue, and an architecture table. Each fact has one home, so any session picks up where the last one stopped.
 
 ## How to use it
+
+> You've read this far, so Godot Director may be what you're looking for. It's free and open source. If it helps you make your game, you can support its development on [Ko-fi](https://ko-fi.com/freakling).
 
 ### Install
 
