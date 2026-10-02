@@ -172,4 +172,6 @@ It exits 0 on pass, 1 on fail, and 3 when it can't run. It remembers the last pa
 | `CLAUDE.md` | instructions for an assistant working on Godot Director itself |
 
 ## License
+Privacy: Godot Director runs on your machine and sends nothing anywhere; see [PRIVACY.md](PRIVACY.md).
+
 MIT © 2026 Vikingur Saemundsson: see [LICENSE](LICENSE). You may use, fork and change Godot Director, including in commercial games, as long as the copyright notice and the license stay with it. Installed games carry a copy in `.godot-director/LICENSE`.

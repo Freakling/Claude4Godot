@@ -13,5 +13,6 @@
     "gamedev",
     "workflow",
     "gdscript"
-  ]
+  ],
+  "homepage": "https://github.com/Freakling/Godot-Director"
 }
